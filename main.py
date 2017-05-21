@@ -15,7 +15,6 @@ def hello():
     return render_template('home.html')
 
 @app.route('/problem/<problem>')
-@app.route("/<problem>")
 def problem(problem):
     selectIndex = problemID.index(problem)
     videoURL = videoID[selectIndex]
@@ -25,8 +24,6 @@ def problem(problem):
 @app.route("/meaning")
 def meaning():
     return render_template("meaning.html")
-
-@app.route("/")
 
 @app.route("/cause")
 def cause():
