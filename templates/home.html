@@ -1,5 +1,8 @@
-<h2>What's the meaning of life?</h2>
-<p>Pitch a book, movie, song, idea...</p>
+<h2>Extend a hand...</h2>
+<p>Whether you're a graduate or not, in a few years, freshmen will be arriving at UCLA.</p>
+<p>Remember the difficulities of first year? Share your experiences throughout college and help
+  the incoming class with some advice and reccomendations.</p>
+
 
 <form id="storyPost" method="post" action="{{ url_for('createGIFStory', page = 0) }}">
   <textarea name='story' id="story" rows="25" cols="100"></textarea>
@@ -7,19 +10,5 @@
   <input type="submit" value="create story">
 </form>
 
-
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" >
-</script>
-<script src="{{ url_for('static', filename='jquery.countdown.js') }}"></script>
-
-<div onclick="hideTimer()" style="text-align: center; font-size: 40px;" id="getting-started"></div>
-<script type="text/javascript">
-  $("#getting-started")
-  .countdown("{{toDate}}", function(event) {
-    $(this).text(
-      event.strftime('Pitches will be revealed in: %I:%M:%S')
-    );
-  });
-</script>
 
 {% extends 'analytics.html' %}
