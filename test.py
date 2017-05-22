@@ -3,6 +3,18 @@ from flask import Flask, render_template, request, jsonify, make_response, send_
 app = Flask(__name__)
 
 
+#TODO: Convert stories to video format *** priority 1 ****
+#TODO: machinelearning time?
+
+#TODO: AI speak text? Easier "movie" watching experience
+#TODO: Still need to handle all unicode 128 + edge-cases... currently only deals with left and right quote
+#TODO: downloadLink https vs http and giphy-downsized-large problems
+#TODO: Allow users to refresh gif choices (also correct array when user clicks back to repick)
+#TODO: User profiles for saved non-public stories and option to make public
+#TODO: Mobile optimize
+#TODO: Next or previous button for next video or story when done
+#TODO: Giphy blocks download on "originals" that they've made as part of a campaign... they are rare but yah.
+
 from ast import literal_eval
 import HTMLParser
 import json
@@ -25,10 +37,16 @@ class Story(Document):
     title = StringField(required=True, max_length=200, default="")
     sentences = ListField(StringField(), required=True, default=list)
     gifURLS = ListField(URLField(), required=True, default=list)
+    #optional urls for additional ways to consume the information
     videoURL = StringField(default="")
+    articleURL = StringField(default="")
+    #downloadURLS are simply gifURLS by replacing .gif with .mp4, so we don't save them
     isPublic = BooleanField(default=False)
     views = IntField(default=0)
     created = DateTimeField(default=datetime.now())
+    genre = StringField(required=True, default="FICTION")
+    location = StringField(required=True, default="UNDEFINED")
+    meta = {'allow_inheritance': True}
 
 class Request(Document):
     storyID = StringField(required=True, default="")
@@ -41,6 +59,13 @@ def home():
 @app.route('/vent')
 def vent():
     return render_template('vent.html')
+
+@app.route('/watch')
+def watch():
+    stories = []
+    for story in Story.objects:
+        stories.append(story)
+    return render_template('home.html', stories = stories)
 
 @app.route("/about")
 def about():
@@ -70,7 +95,7 @@ def story(id, page):
         sentence = story.sentences[page]
 
     shareData = {
-        "link" : "https://penguinjeffrey.herokuapp.com/story/" + id + "/" + "0",
+        "link" : "https://text-to-gif.herokuapp.com/story/" + id + "/" + "0",
         "gif" : story.gifURLS[0],
         "sentence" : story.sentences[0]
     }
@@ -83,8 +108,9 @@ def videoStory(id):
     storyArray = Story.objects(id=id)
     story = storyArray[0]
     videoURL = story.videoURL
-    shareLink = "https://penguinjeffrey.herokuapp.com/story/" + id + "/" + "0"
+    shareLink = "https://text-to-gif.herokuapp.com/story/" + id + "/" + "0"
     return render_template("viewVideoStory.html", story = story, videoURL = videoURL, shareLink = shareLink)
+
 
 
 @app.route("/createGIFStory/<int:page>", methods=["POST"])
@@ -115,6 +141,64 @@ def createGIFStory(page):
         resp.set_cookie('savedGIFS', jsonify(savedGIFS).get_data())
 
     return resp
+
+
+#TODO: Replace /giphy-downsized-large.mp4 with giphy.mp4 reference [catchy title] for download fail case
+@app.route('/downloadStory/<id>', methods=["GET"])
+def downloadStory(id):
+    storyArray = Story.objects(id=id)
+    story = storyArray[0]
+    gifURLS = story.gifURLS;
+    downloadLinks = []
+    for url in gifURLS:
+        downloadLink = url.replace('.gif', '.mp4', 1)
+        downloadLinks.append(downloadLink)
+    return render_template('downloadStory.html', downloadLinks = downloadLinks, id = id)
+
+
+@app.route("/createStory", methods=["POST"])
+def createStory():
+    parser = HTMLParser.HTMLParser()
+    story = request.form['story']
+    count = int(request.form['count'])
+    sentences = convertToStory.convertToStoryToArray(story)
+    selected = parser.unescape(request.form['selected'])
+    selection = parser.unescape(request.form['selection'])
+
+    print "Selection: ", selection
+
+    if selected == "" or selected == None:
+        selected = []
+    else:
+        selected = literal_eval(selected) #required otherwise thinks array is string
+
+    if selection == "" or selection == None :
+        error = "Please select an image :( "
+    else:
+        selected.append(selection)
+
+    if (count == 0):
+        selected = []
+
+    if (count >= len(sentences)):
+        count = -1
+        sentence = "Congrats your done! Look below for directions."
+        contents = []
+        parsedData = ""
+    elif (count < len(sentences)):
+        sentence = sentences[count]
+        phrases = sentenceToText.getRandomNumberFromArray(sentenceToText.getPartsFromSentence(str(sentence)), 3)
+        contents = []
+        for phrase in phrases:
+            content = convertToStory.getContentFromPhrase(phrase)
+            contents.append(content.serialize())
+        data = jsonify(contents)
+        parsedData = data.get_data()
+
+
+    return render_template('createStory.html', story = story, sentence = sentence,
+    count = count, contents = contents, selected = selected, data = parsedData)
+
 
 
 @app.route("/saveStory", methods=["GET", "POST"])
@@ -153,6 +237,27 @@ def videoRequest():
     newRequest.save()
     return render_template("saved.html")
 
+
+@app.route("/gifs")
+def gifs():
+    q = request.args.get('q') or ''
+    randomList, giphyURLS, giphyMP4 = sentenceToText.getGifsFromSentence(q, 4)
+    return render_template('gifs.html', results = giphyURLS, q = q, phrases = randomList,
+    links = giphyMP4)
+
+@app.route("/pics")
+def pics():
+    q = request.args.get('q') or ''
+    phrases, pictureURLS, webLinks  = pixabayAPI.getPicturesFromSentence(q)
+    return render_template('pics.html', results = pictureURLS, q = q, phrases = phrases ,
+    links = webLinks)
+
+@app.route("/videos")
+def videos():
+    q = request.args.get('q') or ''
+    phrases, videoURLS, downloadLinks  = pixabayAPI.getVideosFromSentence(q)
+    return render_template('videos.html', results = videoURLS, q = q, phrases = phrases ,
+    links = downloadLinks)
 
 #Experimental routes
 
