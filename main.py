@@ -146,6 +146,8 @@ def saveStory():
         sentence = StringConversion.replaceUnicode(sentence.raw)
         stringArray.append(sentence)
     title = StringConversion.replaceUnicode(title)
+    if (title == ""):
+        title = stringArray[0]
     why = StringConversion.replaceUnicode(why)
     story = Story(  title=title,
                     sentences=stringArray,
