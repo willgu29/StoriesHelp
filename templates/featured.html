@@ -1,0 +1,21 @@
+<h2><a href="{{url_for('home')}}">Penguin Jeffrey:</a></h2>
+<a href="{{url_for('about')}}">About</a> <br />
+<a href="{{url_for('vent')}}">Vent</a> <br />
+
+
+<br />
+<br />
+<div style="text-align : center;">
+<iframe id="video"
+        style="align : middle; "
+        width="600"
+        height="600"
+        src="{{videoURL}}"
+        frameborder="0"
+        allowfullscreen>
+</iframe>
+</div>
+
+
+
+<a style="float:right;" href="{{url_for('featured', page = page + 1)}}">Next Story</a>

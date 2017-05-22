@@ -17,22 +17,15 @@
   });
 </script>
 
-<br />
-<br />
-<div style="text-align : center;">
-<iframe id="video"
-        style="align : middle; "
-        width="600"
-        height="600"
-        src="https://www.youtube.com/embed/rjaLMSuhNt0"
-        frameborder="0"
-        allowfullscreen>
-</iframe>
-</div>
+<h2 style="text-align: center;">That's all we have for today! Check in later for new stories</h2>
+
+<h4>Leave some feedback</h4>
+<form id="feedbackForm" method="post" action="{{ url_for('feedback') }}">
+  <textarea id="feedback" name="feedback" rows="10" cols="50"></textarea> <br />
+  <input type="submit" value="submit">
+</form>
 
 
-
-<a style="float:right;" href="{{url_for('featured', page = 0)}}">Next Story</a>
 
 
 <script>

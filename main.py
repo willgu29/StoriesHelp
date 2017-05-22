@@ -34,6 +34,9 @@ class Request(Document):
     storyID = StringField(required=True, default="")
     contact = StringField(required=True, default="")
 
+class Feedback(Document):
+    feedback = StringField(required=True, default="")
+
 @app.route("/")
 def home():
     return render_template('home.html', toDate = "2017/05/22")
@@ -46,9 +49,16 @@ def vent():
 def about():
     return render_template("about.html")
 
-@app.route("/featured")
-def featured():
-    return render_template("featured.html", toDate = "2017/05/22", videoURL = "")
+
+videoURLS = ["https://www.youtube.com/embed/IwnVq4TQzDw", "https://www.youtube.com/embed/6WKg-Sn8N9Y"]
+@app.route("/featured/<int:page>")
+def featured(page):
+    if (int(page) >= len(videoURLS)):
+        return render_template('end.html', toDate = "2017/05/22")
+    else:
+        return render_template('featured.html', page = page,
+                                                videoURL = videoURLS[int(page)])
+
 
 
 @app.route("/story/<id>/<page>")
@@ -145,7 +155,7 @@ def saveStory():
     story.save()
     return render_template('savedStory.html', isPublic = isPublic, storyID = story.id)
 
-@app.route("/videoRequest")
+@app.route("/videoRequest", methods=["POST"])
 def videoRequest():
     contact = request.form["contact"]
     storyID = request.form["storyID"]
@@ -153,6 +163,12 @@ def videoRequest():
     newRequest.save()
     return render_template("saved.html")
 
+@app.route("/feedback", methods=["POST"])
+def feedback():
+    feedback = request.form["feedback"]
+    newFeedback = Feedback(feedback=feedback)
+    newFeedback.save()
+    return render_template("feedback.html")
 
 #Experimental routes
 
