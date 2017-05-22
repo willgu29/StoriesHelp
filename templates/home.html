@@ -1,6 +1,11 @@
-<h2><a href="{{url_for('home')}}">Penguin Jeffrey:</a></h2>
-<a href="{{url_for('about')}}">About</a> <br />
-<a href="{{url_for('vent')}}">Vent</a> <br />
+<h2>What's the meaning of life?</h2>
+<p>Pitch a book, movie, song, idea...</p>
+
+<form id="storyPost" method="post" action="{{ url_for('createGIFStory', page = 0) }}">
+  <textarea name='story' id="story" rows="25" cols="100"></textarea>
+  <br />
+  <input type="submit" value="create story">
+</form>
 
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" >
@@ -12,34 +17,9 @@
   $("#getting-started")
   .countdown("{{toDate}}", function(event) {
     $(this).text(
-      event.strftime('Stories will refresh in: %I:%M:%S')
+      event.strftime('Pitches will be revealed in: %I:%M:%S')
     );
   });
-</script>
-
-<br />
-<br />
-<div style="text-align : center;">
-<iframe id="video"
-        style="align : middle; "
-        width="600"
-        height="600"
-        src="https://www.youtube.com/embed/rjaLMSuhNt0"
-        frameborder="0"
-        allowfullscreen>
-</iframe>
-</div>
-
-
-
-<a style="float:right;" href="{{url_for('featured', page = 0)}}">Next Story</a>
-
-
-<script>
-function hideTimer() {
-  $("#getting-started").hide();
-};
-
 </script>
 
 {% extends 'analytics.html' %}
