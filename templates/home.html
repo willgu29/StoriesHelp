@@ -22,7 +22,7 @@
 <div style="text-align: center;">
 <p>The top 3 most viewed 'things' will stay for an extra day.</p>
 </div>
-<h2>Things other people made:</h2>
+<h2>Things left behind:</h2>
 {% if stories is defined %}
   {% for story in stories %}
     <a href="{{url_for('.story', id = story.id, page = 0)}}">{{story.title}}</a> <br />
