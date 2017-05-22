@@ -22,11 +22,12 @@ from datetime import *
 connect("extendV0", host='mongodb://penguinjeffrey:ilikefish12@ds147711.mlab.com:47711/heroku_sl5vqjfj')
 
 class Story(Document):
-    title = StringField(required=True, max_length=200, default="")
+    title = StringField(required=True, default="")
     sentences = ListField(StringField(), required=True, default=list)
     gifURLS = ListField(URLField(), required=True, default=list)
     videoURL = StringField(default="")
-    isPublic = BooleanField(default=False)
+    isPublic = BooleanField(default=True)
+    why = StringField(default="")
     views = IntField(default=0)
     created = DateTimeField(default=datetime.now())
 
@@ -41,18 +42,12 @@ refreshDate = "2017/05/23"
 
 @app.route("/")
 def home():
-    return render_template('home.html', toDate = refreshDate)
-
-@app.route('/create')
-def vent():
-    return render_template('vent.html')
-
-@app.route("/about")
-def about():
-    return render_template("about.html")
+    stories = []
+    for story in Story.objects:
+        stories.append(story)
+    return render_template('home.html', stories = stories, toDate=refreshDate)
 
 
-videoURLS = ["https://www.youtube.com/embed/IwnVq4TQzDw", "https://www.youtube.com/embed/6WKg-Sn8N9Y"]
 @app.route("/featured/<int:page>")
 def featured(page):
     if (int(page) >= len(videoURLS)):
@@ -140,7 +135,8 @@ def saveStory():
 
     print "saving story"
     story = request.form['story']
-    isPublic = int(request.form["isPublic"])
+    title = request.form['title']
+    why = request.form['why']
     urls = literal_eval(request.form['urls'])
     sentences = convertToStory.convertToStoryToArray(story)
 
@@ -149,13 +145,14 @@ def saveStory():
         #we're stuck in ascii currently, so we get rid of common english unicode
         sentence = StringConversion.replaceUnicode(sentence.raw)
         stringArray.append(sentence)
-
-    story = Story(  title=stringArray[0],
+    title = StringConversion.replaceUnicode(title)
+    why = StringConversion.replaceUnicode(why)
+    story = Story(  title=title,
                     sentences=stringArray,
                     gifURLS=urls,
-                    isPublic=isPublic)
+                    why=why)
     story.save()
-    return render_template('savedStory.html', isPublic = isPublic, storyID = story.id)
+    return render_template('savedStory.html', storyID = story.id)
 
 @app.route("/videoRequest", methods=["POST"])
 def videoRequest():

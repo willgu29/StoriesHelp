@@ -1,4 +1,4 @@
-<h2>Your newly created story:</h2>
+<h2>Your newly created thing:</h2>
 
 {%- for content in contents %}
 <div style="float: left; padding-right: 10px;">
@@ -13,19 +13,13 @@
 
 <div style="float: none; clear:both; ">
 
-<h2>Add some finishing details</h2>
+<h2>Add some finishing details:</h2>
 <form id="shareStory" method="post" action="{{ url_for('saveStory')}}">
-
-  Make Public: <select name="isPublic">
-    <option value='1'>Yes</option>
-    <option value='0'>No</option>
-  </select> <br /> <br />
-  Public vents will be converted into a video <a href="{{ url_for('about') }}"
-                                                target=__blank>like this</a>
-  and shared on this site.<br />
+  Title: <input type="text" name="title" /> <br />
+  Leave some feedback: <input type="text" name="why" /> <br />
   <input type="hidden" name="story" value="{{ story }}" />
   <input type="hidden" id="urls" name="urls" value="{{ contents }}" /> <br />
-  <input name type="submit" value="Save Story" />
+  <input name type="submit" value="Save It" />
 </form>
 
 

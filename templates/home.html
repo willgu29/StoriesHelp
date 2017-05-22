@@ -1,8 +1,7 @@
-<h2>Tell a story:</h2>
 <form id="storyPost" method="post" action="{{ url_for('createGIFStory', page = 0) }}">
   <textarea name='story' id="story" rows="25" cols="100"></textarea>
   <br />
-  <input type="submit" value="create story">
+  <input type="submit" value="submit">
 </form>
 
 <br />
@@ -16,25 +15,19 @@
   $("#getting-started")
   .countdown("{{toDate}}", function(event) {
     $(this).text(
-      event.strftime('Stories will refresh in: %I:%M:%S')
+      event.strftime('All things will refresh in: %I:%M:%S')
     );
   });
 </script>
-
-
-
-<br />
-<br />
-<div style="text-align : center;">
-<iframe id="video"
-        style="align : middle; "
-        width="600"
-        height="600"
-        src="https://www.youtube.com/embed/rjaLMSuhNt0"
-        frameborder="0"
-        allowfullscreen>
-</iframe>
+<div style="text-align: center;">
+<p>The top 3 most viewed 'things' will stay for an extra day.</p>
 </div>
+<h2>Things other people made:</h2>
+{% if stories is defined %}
+  {% for story in stories %}
+    <a href="{{url_for('.story', id = story.id, page = 0)}}">{{story.title}}</a> <br />
+  {% endfor %}
+{% endif %}
 
 
 
