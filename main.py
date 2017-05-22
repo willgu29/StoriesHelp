@@ -37,9 +37,11 @@ class Request(Document):
 class Feedback(Document):
     feedback = StringField(required=True, default="")
 
+refreshDate = "2017/05/23"
+
 @app.route("/")
 def home():
-    return render_template('home.html', toDate = "2017/05/22")
+    return render_template('home.html', toDate = refreshDate)
 
 @app.route('/create')
 def vent():
@@ -54,7 +56,7 @@ videoURLS = ["https://www.youtube.com/embed/IwnVq4TQzDw", "https://www.youtube.c
 @app.route("/featured/<int:page>")
 def featured(page):
     if (int(page) >= len(videoURLS)):
-        return render_template('end.html', toDate = "2017/05/22")
+        return render_template('end.html', toDate = refreshDate)
     else:
         return render_template('featured.html', page = page,
                                                 videoURL = videoURLS[int(page)])
