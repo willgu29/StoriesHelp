@@ -31,19 +31,17 @@
 
 <h2><a href="/">Home</a></h2>
 
-<h4 style="text-align:center;" id="page">Page {{ count + 1 }} / {{ length }}</h4>
+<!--<h4 style="text-align:center;" id="page">Page {{ count + 1 }} / {{ length }}</h4> -->
 <br />
 
-<div style="text-align:center;">
+<div onclick="nextPage()" style="text-align:center;">
   <img style="align:middle;" id="content" src="{{ content }}" />
 </div>
 
  <br />
 <h2 style="text-align:center;" id="sentence">{{ sentence }}</h2>
 
-<form style="text-align:center;" id="storyPost" action="{{ url_for('story', id = story.id, page = (count + 1) ) }}">
-
-  <input  type="submit" value="next page" />
+<form style="text-align:center;" id="nextPage" action="{{ url_for('story', id = story.id, page = (count + 1) ) }}">
 
 </form>
 
@@ -57,6 +55,7 @@
     data-href="{{shareData.link}}"
     data-layout="button">
   </div>
+  <div><p>Click the gif to continue</p></div>
 {% endif %}
 
 {% if count == -1 %}
@@ -66,6 +65,10 @@
    data-layout="button">
 </div>
 {% endif %}
-
+<script>
+  function nextPage() {
+    document.getElementById("nextPage").submit();
+  }
+</script>
 
 {% extends 'analytics.html' %}
