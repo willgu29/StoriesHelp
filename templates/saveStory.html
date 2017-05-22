@@ -16,7 +16,7 @@
 <h2>Add some finishing details:</h2>
 <form id="shareStory" method="post" action="{{ url_for('saveStory')}}">
   Title: <input type="text" name="title" /> <br />
-  Leave some feedback: <input type="text" name="why" /> <br />
+  Leave some feedback (optional): <input type="text" name="why" /> <br />
   <input type="hidden" name="story" value="{{ story }}" />
   <input type="hidden" id="urls" name="urls" value="{{ contents }}" /> <br />
   <input name type="submit" value="Save It" />
