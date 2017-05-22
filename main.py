@@ -38,7 +38,7 @@ class Request(Document):
 def home():
     return render_template('home.html', toDate = "2017/05/22")
 
-@app.route('/vent')
+@app.route('/create')
 def vent():
     return render_template('vent.html')
 
