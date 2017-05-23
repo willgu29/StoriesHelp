@@ -1,0 +1,126 @@
+
+
+<br />
+<br />
+<br />
+<span id="timer"></span>
+<p>Render time left </p>
+
+<div id="theater">
+  <video onclick="startRender()" id="video" src="../static/testData/test.mp4"></video>
+  <canvas width=600 height=600 id="canvas"></canvas>
+  <label>
+    <br />Try to play me :)</label>
+  <br />
+</div>
+
+
+<input type="submit" onclick="playVoice()" />
+
+<script >
+
+
+</script>
+
+<script>
+
+function playAudio() {
+  var audio = new Audio("../static/testData/MyCrush.mp3");
+  audio.play();
+}
+
+
+function playVoice() {
+  var msg = new SpeechSynthesisUtterance('Hello World');
+  var voices = window.speechSynthesis.getVoices();
+  msg.voice = voices[50];  //British male uk
+  msg.onend = function(e) {
+    console.log('Finished in ' + event.elapsedTime + ' seconds.');
+  };
+
+  window.speechSynthesis.speak(msg);
+
+}
+window.speechSynthesis.onvoiceschanged = function() {
+    voices = window.speechSynthesis.getVoices();
+    console.log(voices)
+};
+
+</script>
+
+
+<script>
+var canvas = document.getElementById('canvas');
+var ctx    = canvas.getContext('2d');
+var video  = document.getElementById('video');
+ctx.font = "30px Avenir";
+ctx.fillStyle = "white"
+ctx.fillText("Hello World",canvas.width/2,canvas.height-80);
+ctx.textAlign = "center";
+
+
+video.addEventListener('play', function () {
+    var $this = this; //cache
+    (function loop() {
+        if (!$this.paused && !$this.ended) {
+            ctx.drawImage($this, 0, 0);
+            setTimeout(loop, 1000 / 30); // drawing at 30fps
+        }
+    })();
+}, 0);
+
+video.addEventListener('ended',myHandler,false);
+    function myHandler(e) {
+        var $this = this;
+        (function nextVideo() {
+          $this.src = "../static/testData/aa.mp4"
+          $this.play()
+        })();
+    }
+
+</script>
+
+<script src="../static/scripts/CCapture.all.min.js"></script>
+
+<script>
+    var capturer = new CCapture( {
+       format: 'gif',
+       workersPath: '../static/scripts/',
+       framerate: 30,
+	     verbose: true,
+       display: true,
+       timeLimit: 5,
+       startTime: 0,
+
+     } );
+
+  function startRender() {
+    var video  = document.getElementById('video');
+    setInterval(timer, 10);
+    video.play();
+    capturer.start();
+    render()
+
+  }
+
+  function render(){
+	   requestAnimationFrame(render);
+	    // rendering stuff ...
+	     capturer.capture( document.getElementById('canvas'));
+  }
+
+  var count = 500;
+
+
+  function timer()
+  {
+      if (count <= 0)
+      {
+          clearInterval(counter);
+          return;
+       }
+       count--;
+       document.getElementById("timer").innerHTML=count /100+ " secs";
+   }
+
+</script>

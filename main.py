@@ -40,6 +40,10 @@ class Feedback(Document):
 
 refreshDate = "2017/05/23"
 
+@app.route("/test")
+def test():
+    return render_template("canvas.html")
+
 @app.route("/")
 def home():
     stories = []
