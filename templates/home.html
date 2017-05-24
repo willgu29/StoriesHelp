@@ -24,10 +24,13 @@
 {% if stories is defined %}
   {% for story in stories %}
     {% if story.videoURL != "" %}
-      <a href="{{url_for('.videoStory', id = story.id)}}">{{story.title}})</a> <br />
+      <a href="{{url_for('.videoStory', id = story.id)}}">{{story.title}}</a> <br />
     {% endif %}
   {% endfor %}
 {% endif %}
+
+<br />
+<br />
 
 <!--
 <h2>Say Happy Birthday... differently.</h2>

@@ -1,0 +1,11 @@
+<h2>Super secret auto-generate route: </h2>
+<p>In a flash:</p>
+
+
+<form id="storyPost" method="post" action="{{ url_for('generateStory') }}">
+  <textarea name='story' id="story" rows="25" cols="100"></textarea>
+  <br />
+  <input type="submit" value="generate story">
+</form>
+
+{% extends 'analytics.html' %}

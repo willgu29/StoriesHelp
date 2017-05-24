@@ -1,12 +1,17 @@
 <h2>Your newly created story:</h2>
 
+{% if contents|length > 25 %}
+<p>Your story has too many sentences to preview. Save it and pray!</p>
+{% else %}
+
 {%- for content in contents %}
 <div style="float: left; padding-right: 10px;">
   <img  class="gifDisplay" style="border-color : purple;" height=300 src="{{ content }}" />
   <p style="text-align: center;">{{sentences[loop.index-1]}}</p>
 </div>
-
 {%- endfor %}
+
+{% endif %}
 
 <br />
 

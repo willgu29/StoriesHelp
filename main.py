@@ -229,10 +229,10 @@ def render(id):
 
     return render_template('render.html', filePath = filePath, errors = errorFiles)
 
-@app.route("/generateStory", methods=["GET", "POST"])
+@app.route("/generate", methods=["GET", "POST"])
 def generateStory():
     if (request.method == "GET"):
-        return render_template("test.html")
+        return render_template("generate.html")
 
     story = request.form['story']
     sentences = convertToStory.convertToStoryToArray(story)
