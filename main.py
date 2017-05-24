@@ -110,7 +110,6 @@ def createGIFStory(page):
         page = -1
     else:
         sentence = sentences[page]
-        #get rid of left and right hanging quotes for utf-8
         sentenceParts, gifURLS, gifMP4S =  sentenceToText.getGifsFromSentence(sentence.raw, 3)
 
     if (page == -1):
@@ -245,6 +244,25 @@ def generateStory():
 
     return render_template("saveStory.html", story = story, sentences = sentences, contents = selectedGIFS)
 
+@app.route("/api/translate")
+def getTranslate():
+    sentence = req.args.query("searchText")
+
+
+@app.route("/api/<contentType>")
+def getContent(contentType):
+    searchText = req.args.query("searchText")
+    if (contentType == "gifs"):
+        print "gifs"
+        parts, urls, mp4s = sentenceToText.getGifsFromSentence(searchText, 3)
+        return urls
+    elif (contentType == "pics"):
+        print "pics"
+    elif (contentType == "vids"):
+        print "vids"
+    else:
+        print "other"
+        return []
 
 if __name__ == "__main__":
     app.run()
