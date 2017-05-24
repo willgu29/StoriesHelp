@@ -27,7 +27,6 @@ class Story(Document):
     gifURLS = ListField(URLField(), required=True, default=list)
     videoURL = StringField(default="")
     isPublic = BooleanField(default=True)
-    why = StringField(default="")
     views = IntField(default=0)
     created = DateTimeField(default=datetime.now())
 
@@ -43,6 +42,10 @@ refreshDate = "2017/05/23"
 @app.route("/test")
 def test():
     return render_template("canvas.html")
+
+@app.route("/create")
+def create():
+    return render_template('create.html')
 
 @app.route("/")
 def home():
@@ -140,7 +143,6 @@ def saveStory():
     print "saving story"
     story = request.form['story']
     title = request.form['title']
-    why = request.form['why']
     urls = literal_eval(request.form['urls'])
     sentences = convertToStory.convertToStoryToArray(story)
 
@@ -152,11 +154,9 @@ def saveStory():
     title = StringConversion.replaceUnicode(title)
     if (title == ""):
         title = stringArray[0]
-    why = StringConversion.replaceUnicode(why)
     story = Story(  title=title,
                     sentences=stringArray,
-                    gifURLS=urls,
-                    why=why)
+                    gifURLS=urls)
     story.save()
     return render_template('savedStory.html', storyID = story.id)
 

@@ -1,33 +1,61 @@
-<h2>Tell a story</h2>
-<form id="storyPost" method="post" action="{{ url_for('createGIFStory', page = 0) }}">
-  <textarea name='story' id="story" rows="25" cols="100"></textarea>
-  <br />
-  <input type="submit" value="submit">
-</form>
+<h2>Stories added daily</h2>
+<a href="{{url_for('create')}}">Or create your own </a>
 
 <br />
+<br />
 
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" >
-</script>
-<script src="{{ url_for('static', filename='jquery.countdown.js') }}"></script>
+<h2 style="text-align: center;">Most Recent</h2>
 
-<div onclick="hideTimer()" style="text-align: center; font-size: 40px;" id="getting-started"></div>
-<script type="text/javascript">
-  $("#getting-started")
-  .countdown("{{toDate}}", function(event) {
-    $(this).text(
-      event.strftime('Stories will refresh in: %I:%M:%S')
-    );
-  });
-</script>
-<div style="text-align: center;">
+<div style="text-align : center;">
+<iframe style="align : middle; "
+        width="600"
+        height="600"
+        src="https://www.youtube.com/embed/mnObHRfrsuQ"
+        frameborder="0"
+        allowfullscreen>
+</iframe>
 </div>
+
+<br />
+<br />
+
+<h2>Other stories:</h2>
+
 {% if stories is defined %}
   {% for story in stories %}
-    <a href="{{url_for('.story', id = story.id, page = 0)}}">{{story.title}}</a> <br />
+    {% if story.videoURL != "" %}
+      <a href="{{url_for('.videoStory', id = story.id)}}">{{story.title}})</a> <br />
+    {% endif %}
   {% endfor %}
 {% endif %}
 
+<!--
+<h2>Say Happy Birthday... differently.</h2>
 
+<br />
+<br />
+<div style="text-align : center;">
+<iframe style="align : middle; "
+        width="600"
+        height="600"
+        src="https://www.youtube.com/embed/mnObHRfrsuQ"
+        frameborder="0"
+        allowfullscreen>
+</iframe>
+
+<h2>How?</h2>
+<li>
+  <ol>Choose your words</ol>
+  <ol>Choose a gif(s) to match your words</ol>
+  <ol>Pick an AI voice (or record your voice)</ol>
+  <ol>We'll send you a link to your video when it's ready!</ol>
+</li>
+
+<h2 style="text-align:center;"><a href="url_for('start')">Get Started</a></h2>
+
+
+<h2>Looking for something more specific?</h2>
+<p>Just let us know <a href="mailto:willgu29@gmail.com">here</a></p>
+-->
 
 {% extends 'analytics.html' %}

@@ -1,4 +1,4 @@
-<h2>Your newly created thing:</h2>
+<h2>Your newly created story:</h2>
 
 {%- for content in contents %}
 <div style="float: left; padding-right: 10px;">
@@ -15,8 +15,7 @@
 
 <h2>Add some finishing details:</h2>
 <form id="shareStory" method="post" action="{{ url_for('saveStory')}}">
-  Title: <input type="text" name="title" /> <br />
-  Leave some feedback (optional): <input type="text" name="why" /> <br />
+  Title (optional): <input type="text" name="title" value="" /> <br />
   <input type="hidden" name="story" value="{{ story }}" />
   <input type="hidden" id="urls" name="urls" value="{{ contents }}" /> <br />
   <input name type="submit" value="Save It" />

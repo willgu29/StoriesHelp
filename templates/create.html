@@ -1,0 +1,12 @@
+<h2>Create a story: </h2>
+<p>Type in a few sentences</p>
+
+
+<form id="storyPost" method="post" action="{{ url_for('createGIFStory', page = 0) }}">
+  <textarea name='story' id="story" rows="25" cols="100"></textarea>
+  <br />
+  <input type="submit" value="create story">
+</form>
+
+
+{% extends 'analytics.html' %}
