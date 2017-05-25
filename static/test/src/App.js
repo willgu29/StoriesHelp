@@ -4,6 +4,18 @@ import './App.css';
 import axios from 'axios';
 
 class App extends Component {
+  constructor(props) {
+   super(props);
+   this.createSlide = this.createSlide.bind(this);
+   this.state = {
+     sentences: [],
+     urls: []
+   }
+  }
+  createSlide(text, url) {
+    this.state.sentences.append(text);
+    this.state.urls.append(url);
+  }
   render() {
     return (
       <div className="App">
@@ -11,8 +23,37 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome to React</h2>
         </div>
-        <TypeStory></TypeStory>
+
+        <br />
+        <TypeStory createSlide={this.createSlide} ></TypeStory>
+
+        <br />
+        <br />
+        <br />
+        <Preview sentences={this.state.sentences}
+                  urls={this.state.urls}></Preview>
       </div>
+    );
+  }
+}
+
+class Preview extends Component {
+  constructor(props) {
+   super(props);
+   this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  handleSubmit(event) {
+    event.preventDefault();
+    //post to preview url with sentences and urls
+  }
+
+  render() {
+    return (
+      <form methods="post" onSubmit={this.handleSubmit} >
+        <input type="hidden" name="sentences" value={this.props.sentences} />
+        <input type="hidden" name="urls" value={this.props.urls} />
+        <input type="submit" value="preview story" />
+      </form>
     );
   }
 }
@@ -35,10 +76,8 @@ class TypeStory extends Component {
   }
   handleSubmit(event) {
    event.preventDefault();
-   //get selected url and text, 'save it'
-   //create a "slide"
-   //refresh states
 
+   this.props.createSlide(this.state.text, this.state.url);
    this.setState({text : '',
                   url  : '',
                   urls : []})
