@@ -23,28 +23,36 @@ class TypeStory extends Component {
    this.state = {text: ''};
    this.handleChange = this.handleChange.bind(this);
    this.handleSubmit = this.handleSubmit.bind(this);
+   this.handleURL = this.handleURL.bind(this);
+
   }
 
   handleChange(event) {
       this.setState({text: event.target.value});
+      this.setState({"urls" : ["http://media3.giphy.com/media/kMSyCATSq9SEw/giphy.gif",
+                              "http://media2.giphy.com/media/3o6Yg6gk00QtuKBgTS/giphy.gif",
+                              "http://media1.giphy.com/media/fxZvE8YuYJwRi/giphy.gif"]});
   }
   handleSubmit(event) {
    event.preventDefault();
-   //Fetch 3 contentURLS, abstract a "slide"
-  //  axios.get('http://localhost:5000/api/gifs?text=' + this.state.text)
-  //     .then(res => {
-  //       alert(res)
-  //       const contentURLS = res.data.map(obj => obj.data);
-  //       this.setState({ "urls" : ["hi", "test", "great"] });
-  //     });
-  this.setState({"urls" : ["http://media3.giphy.com/media/kMSyCATSq9SEw/giphy.gif",
-                          "http://media2.giphy.com/media/3o6Yg6gk00QtuKBgTS/giphy.gif",
-                          "http://media1.giphy.com/media/fxZvE8YuYJwRi/giphy.gif"]});
+   //get selected url and text, 'save it'
+   //create a "slide"
+   //refresh states
+
+   this.setState({text : '',
+                  url  : '',
+                  urls : []})
+
   }
+  handleURL(url){
+    this.setState({url : url})
+  }
+
   render() {
     return (
       <div>
-        <ContentViews urls={this.state.urls} ></ContentViews>
+        <ContentViews onSelect={this.handleURL} urls={this.state.urls} ></ContentViews>
+        {this.state.url}
       <form onSubmit={this.handleSubmit}>
         <label>
           <textarea value={this.state.text} onChange={this.handleChange}></textarea>
@@ -129,7 +137,6 @@ class ContentViews extends Component {
 
   }
   handleSelect(i) {
-    alert(i)
     var url = this.props.urls[i];
     var setSelected = [false, false, false];
     setSelected[i] = true;
@@ -137,6 +144,8 @@ class ContentViews extends Component {
       'selectedURL': url,
       'isSelected': setSelected
     });
+
+    this.props.onSelect(this.state.selectedURL)
 
   }
 
