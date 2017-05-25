@@ -29,6 +29,7 @@ class Story(Document):
     isPublic = BooleanField(default=True)
     views = IntField(default=0)
     created = DateTimeField(default=datetime.now())
+    isDraft = BooleanField(default=True)
 
 class Request(Document):
     storyID = StringField(required=True, default="")
@@ -246,16 +247,16 @@ def generateStory():
 
 @app.route("/api/translate")
 def getTranslate():
-    sentence = req.args.query("searchText")
+    sentence = request.args.get("text")
 
 
 @app.route("/api/<contentType>")
 def getContent(contentType):
-    searchText = req.args.query("searchText")
+    text = request.args.get("text")
     if (contentType == "gifs"):
         print "gifs"
-        parts, urls, mp4s = sentenceToText.getGifsFromSentence(searchText, 3)
-        return urls
+        parts, urls, mp4s = sentenceToText.getGifsFromSentence(text, 3)
+        return jsonify(urls)
     elif (contentType == "pics"):
         print "pics"
     elif (contentType == "vids"):

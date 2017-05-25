@@ -11,7 +11,7 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome to React</h2>
         </div>
-        <ContentViews></ContentViews>
+        <TypeStory></TypeStory>
       </div>
     );
   }
@@ -20,39 +20,60 @@ class App extends Component {
 class TypeStory extends Component {
   constructor(props) {
    super(props);
-   this.state = {storyText: ''};
+   this.state = {text: ''};
    this.handleChange = this.handleChange.bind(this);
    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleChange(event) {
-      this.setState({storyText: event.target.value});
+      this.setState({text: event.target.value});
   }
   handleSubmit(event) {
    event.preventDefault();
    //Fetch 3 contentURLS, abstract a "slide"
+  //  axios.get('http://localhost:5000/api/gifs?text=' + this.state.text)
+  //     .then(res => {
+  //       alert(res)
+  //       const contentURLS = res.data.map(obj => obj.data);
+  //       this.setState({ "urls" : ["hi", "test", "great"] });
+  //     });
+  this.setState({"urls" : ["http://media3.giphy.com/media/kMSyCATSq9SEw/giphy.gif",
+                          "http://media2.giphy.com/media/3o6Yg6gk00QtuKBgTS/giphy.gif",
+                          "http://media1.giphy.com/media/fxZvE8YuYJwRi/giphy.gif"]});
   }
   render() {
     return (
+      <div>
+        <ContentViews urls={this.state.urls} ></ContentViews>
       <form onSubmit={this.handleSubmit}>
         <label>
-          <textarea value={this.state.storyText} onChange={this.handleChange}></textarea>
+          <textarea value={this.state.text} onChange={this.handleChange}></textarea>
         </label>
         <input type="submit" value="add sentence" />
       </form>
 
+      </div>
+
     );
   }
+}
+
+var selectedViewStyle = {
+  border: '3px solid purple',
+}
+var nonSelectedViewStyle = {
+  border: '0px solid purple'
 }
 
 class GifView extends Component {
 
   render() {
     return (
-
-      <img class="gifDisplay" style="border-color : purple;" width="340"
+      <img className="Display-gif"
         onClick={() => this.props.onClick()}
-        src={this.props.url} />
+        src={this.props.url}
+        style={this.props.style}
+        alt="Can't load gif" />
     );
   }
 }
@@ -72,26 +93,32 @@ class ImageView extends Component {
 class ContentViews extends Component {
   constructor(props) {
     super(props);
-    this.state = {contentURLS : Array(3).fill(null), };
+    this.state = {'isSelected' : [false, false, false]}
     this.handleSelect = this.handleSelect.bind(this);
   }
   componentWillMount() {
-    axios.get('localhost:5000/api/gifs?searchText={this.state.searchText}')
-       .then(res => {
-         const contentURLS = res.data
-         alert(contentURLS)
-         this.setState({contentURLS : contentURLS});
-       });
+
   }
 
-  renderURL(i) {
-    var url = this.state.contentURLS[i];
+  renderURL(i, selected) {
+    var style = {}
+    if (selected) {
+      style = selectedViewStyle;
+    } else {
+      style = nonSelectedViewStyle;
+    }
+    if (this.props.urls == null) {
+      return (<div></div>);
+    }
+    var url = this.props.urls[i];
     if (url == null) {
       return (<div></div>)
     }
     if (url.indexOf('.gif') !== -1) {
-      return (<GifView   url={this.state.contentURLS[i]}
-              onClick={() => this.handleSelect(i)} />);
+      return (<GifView
+              url={this.props.urls[i]}
+              style={style}
+              onClick={() => this.handleSelect(i)}></GifView>);
 
     } else if (url.indexOf(".mp4") !== -1) {
       //is video
@@ -103,14 +130,24 @@ class ContentViews extends Component {
   }
   handleSelect(i) {
     alert(i)
+    var url = this.props.urls[i];
+    var setSelected = [false, false, false];
+    setSelected[i] = true;
+    this.setState({
+      'selectedURL': url,
+      'isSelected': setSelected
+    });
+
   }
 
   render() {
+
     return (
     <div className="board-row">
-      {this.renderURL(0)}
-      {this.renderURL(1)}
-      {this.renderURL(2)}
+      {this.props.urls}
+      {this.renderURL(0, this.state.isSelected[0])}
+      {this.renderURL(1, this.state.isSelected[1])}
+      {this.renderURL(2, this.state.isSelected[2])}
     </div>
   );
   }
@@ -131,7 +168,7 @@ class ContentViews extends Component {
 class SearchBar extends Component {
   constructor(props) {
    super(props);
-   this.state = {searchText: ''};
+   this.state = {text: ''};
    this.handleChange = this.handleChange.bind(this);
    this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -141,7 +178,7 @@ class SearchBar extends Component {
   }
   handleSubmit(event) {
    event.preventDefault();
-   axios.get('https://penguinjeffrey.herokuapp.com/api/gifs?searchText={this.state.searchText}')
+   axios.get('https://localhost:5000/api/gifs?text={this.state.text}')
       .then(res => {
         const contentURLS = res.data.map(obj => obj.data);
         this.setState({ contentURLS });
@@ -154,7 +191,7 @@ class SearchBar extends Component {
       <form onSubmit={this.handleSubmit}>
         <label>
           Search:
-          <input type="text" value={this.state.searchText} onChange={this.handleChange} />
+          <input type="text" value={this.state.text} onChange={this.handleChange} />
         </label>
         <input type="submit" value="Submit" />
       </form>
