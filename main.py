@@ -32,7 +32,7 @@ class Story(Document):
     isDraft = BooleanField(default=True)
     tag = StringField(default="")
     externalURL = StringField(default="")
-    #current tags: purpose, journey (process), relationships, self (anxiety/fear),
+    #current tags: PURPOSE, JOURNEY (process), RELATIONSHIPS, SELF (anxiety/fear),
 
 class Request(Document):
     storyID = StringField(required=True, default="")
@@ -45,7 +45,11 @@ refreshDate = "2017/05/23"
 
 @app.route("/test")
 def test():
-    return render_template("canvas.html")
+    return render_template("test.html")
+
+@app.route("/react")
+def react():
+    return render_template("../static/test/build/index.html")
 
 @app.route("/create")
 def create():
@@ -252,12 +256,13 @@ def generateStory():
 
 @app.route("/api/translate")
 def getTranslate():
-    sentence = request.args.get("text")
+    sentence = request.args.get("q")
 
 
 @app.route("/api/<contentType>")
 def getContent(contentType):
-    text = request.args.get("text")
+    text = request.args.get("q")
+    print("query: " + text)
     if (contentType == "gifs"):
         print "gifs"
         parts, urls, mp4s = sentenceToText.getGifsFromSentence(text, 3)

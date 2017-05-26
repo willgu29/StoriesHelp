@@ -13,8 +13,14 @@ class App extends Component {
    }
   }
   createSlide(text, url) {
-    this.state.sentences.append(text);
-    this.state.urls.append(url);
+    var sentences = this.state.sentences;
+    var urls = this.state.urls;
+    sentences.push(text);
+    urls.push(url);
+    this.setState({
+      sentences : sentences,
+      urls : urls
+    })
   }
   render() {
     return (
@@ -45,36 +51,114 @@ class Preview extends Component {
   handleSubmit(event) {
     event.preventDefault();
     //post to preview url with sentences and urls
-    
+
   }
 
   render() {
+    var numberOfSlides = this.props.sentences.length;
     return (
-      <form methods="post" onSubmit={this.handleSubmit} >
+      <div>
+      <form method="post" onSubmit={this.handleSubmit} >
         <input type="hidden" name="sentences" value={this.props.sentences} />
         <input type="hidden" name="urls" value={this.props.urls} />
+        Number of Sentences: {numberOfSlides}
         <input type="submit" value="preview story" />
       </form>
+      <br />
+
+      </div>
     );
   }
 }
 
+class PreviewDisplay extends Component {
+  render() {
+    return (
+      <div style={alignLeftStyle}>
+        <img src={this.props.url} style={previewGifStyle} />
+        <p style={captionStyle}>{this.props.sentence}</p>
+      </div>
+    );
+  }
+}
+
+var alignLeftStyle = {
+  float : 'left',
+  paddingRight : "10px",
+}
+var previewGifStyle = {
+  height : '100px'
+}
+
+var captionStyle = {
+  textAlign : "center",
+}
+
+function search(query, callback){
+  return fetch('/api/gifs?q='+query , {
+    accept: 'application/json',
+  }).then(checkStatus)
+  .then(parseJSON)
+  .then(callback);
+}
+
+
+function checkStatus(response) {
+  if (response.status >= 200 && response.status < 300) {
+    return response;
+  }
+  const error = new Error(`HTTP Error ${response.statusText}`);
+  error.status = response.statusText;
+  error.response = response;
+  console.log(error); // eslint-disable-line no-console
+  throw error;
+}
+
+function parseJSON(response) {
+  return response.json();
+}
+
+
+const WAIT_INTERVAL = 250;
+
 class TypeStory extends Component {
   constructor(props) {
    super(props);
-   this.state = {text: ''};
+   this.state = {text : '',
+                url : '',
+                urls : []};
    this.handleChange = this.handleChange.bind(this);
    this.handleSubmit = this.handleSubmit.bind(this);
    this.handleURL = this.handleURL.bind(this);
+   this.refreshURLS = this.refreshURLS.bind(this);
+   this.triggerChange = this.triggerChange.bind(this);
 
+
+  }
+  refreshURLS(urls) {
+    this.setState({"urls" : urls});
+  }
+  componentWillMount() {
+    this.timer = null;
   }
 
   handleChange(event) {
-      this.setState({text: event.target.value});
+    clearTimeout(this.timer);
+    this.setState({text: event.target.value});
+    this.timer = setTimeout(this.triggerChange, WAIT_INTERVAL);
+      /*
       this.setState({"urls" : ["http://media3.giphy.com/media/kMSyCATSq9SEw/giphy.gif",
                               "http://media2.giphy.com/media/3o6Yg6gk00QtuKBgTS/giphy.gif",
-                              "http://media1.giphy.com/media/fxZvE8YuYJwRi/giphy.gif"]});
+                              "http://media1.giphy.com/media/fxZvE8YuYJwRi/giphy.gif"]}); */
   }
+
+  triggerChange() {
+    if (this.state.text != "") {
+      this.state.url = ""
+      search(this.state.text, this.refreshURLS)
+    }
+  }
+
   handleSubmit(event) {
    event.preventDefault();
 
@@ -89,15 +173,22 @@ class TypeStory extends Component {
   }
 
   render() {
+    var showInput = (<input type="submit" value="add sentence" />)
+    if (this.state.url == ''){
+      showInput = (<div></div>)
+    }
     return (
       <div>
         <ContentViews onSelect={this.handleURL} urls={this.state.urls} ></ContentViews>
-        {this.state.url}
+
+        <br />
+        <br />
+        <br />
       <form onSubmit={this.handleSubmit}>
         <label>
           <textarea value={this.state.text} onChange={this.handleChange}></textarea>
         </label>
-        <input type="submit" value="add sentence" />
+        {showInput}
       </form>
 
       </div>
@@ -107,7 +198,7 @@ class TypeStory extends Component {
 }
 
 var selectedViewStyle = {
-  border: '3px solid purple',
+  border: '3px solid purple'
 }
 var nonSelectedViewStyle = {
   border: '0px solid purple'
@@ -144,8 +235,9 @@ class ContentViews extends Component {
     this.state = {'isSelected' : [false, false, false]}
     this.handleSelect = this.handleSelect.bind(this);
   }
-  componentWillMount() {
 
+  componentWillReceiveProps(nextProps) {
+    this.state = {'isSelected' : [false, false, false]}
   }
 
   renderURL(i, selected) {
@@ -181,11 +273,11 @@ class ContentViews extends Component {
     var setSelected = [false, false, false];
     setSelected[i] = true;
     this.setState({
-      'selectedURL': url,
+      // 'selectedURL': url,
       'isSelected': setSelected
     });
 
-    this.props.onSelect(this.state.selectedURL)
+    this.props.onSelect(url)
 
   }
 
@@ -193,7 +285,6 @@ class ContentViews extends Component {
 
     return (
     <div className="board-row">
-      {this.props.urls}
       {this.renderURL(0, this.state.isSelected[0])}
       {this.renderURL(1, this.state.isSelected[1])}
       {this.renderURL(2, this.state.isSelected[2])}
