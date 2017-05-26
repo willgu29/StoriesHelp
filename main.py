@@ -101,8 +101,10 @@ def videoStory(id):
     storyArray = Story.objects(id=id)
     story = storyArray[0]
     videoURL = story.videoURL
+    externalURL = story.externalURL
     shareLink = "https://penguinjeffrey.herokuapp.com/story/" + id + "/" + "0"
-    return render_template("viewVideoStory.html", story = story, videoURL = videoURL, shareLink = shareLink)
+    return render_template("viewVideoStory.html", story = story, videoURL = videoURL,
+                                                shareLink = shareLink, externalURL = externalURL)
 
 
 @app.route("/createGIFStory/<int:page>", methods=["POST"])
