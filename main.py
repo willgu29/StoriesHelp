@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, make_response, send_from_directory
+from flask import Flask, render_template, request, jsonify, make_response, send_from_directory, redirect, url_for
 
 app = Flask(__name__)
 
@@ -45,7 +45,7 @@ refreshDate = "2017/05/23"
 
 @app.route("/test")
 def test():
-    return render_template("test.html")
+    return render_template("react.html")
 
 @app.route("/react")
 def react():
@@ -165,7 +165,9 @@ def saveStory():
         title = stringArray[0]
     story = Story(  title=title,
                     sentences=stringArray,
-                    gifURLS=urls)
+                    gifURLS=urls,
+                    isDraft=False)
+
     story.save()
     return render_template('savedStory.html', storyID = story.id)
 
@@ -254,6 +256,35 @@ def generateStory():
 
     return render_template("saveStory.html", story = story, sentences = sentences, contents = selectedGIFS)
 
+
+@app.route("/api/saved/<id>")
+def saved(id):
+    return render_template('savedStory.html', storyID = id)
+
+@app.route("/api/saveStory", methods=["POST"])
+def saveStoryAPI():
+    print request.get_json();
+    json = request.get_json();
+    sentences = json['sentences']
+    title = json['title']
+    urls = json['urls']
+
+
+    if (len(sentences) == 0):
+        return redirect(url_for('home'))
+
+    if (title == ""):
+        title = sentences[0]
+
+    newStory = Story(   title=title,
+                        sentences=sentences,
+                        gifURLS=urls,
+                        isDraft=False)
+    newStory.save()
+    return jsonify(id=str(newStory.id))
+
+
+
 @app.route("/api/translate")
 def getTranslate():
     sentence = request.args.get("q")
@@ -265,8 +296,8 @@ def getContent(contentType):
     print("query: " + text)
     if (contentType == "gifs"):
         print "gifs"
-        parts, urls, mp4s = sentenceToText.getGifsFromSentence(text, 3)
-        return jsonify(urls)
+        parts, urls, mp4s = sentenceToText.getGifsFromSentence(text, 4)
+        return jsonify(urls=urls)
     elif (contentType == "pics"):
         print "pics"
     elif (contentType == "vids"):

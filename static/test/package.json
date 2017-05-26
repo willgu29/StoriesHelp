@@ -17,5 +17,5 @@
     "eject": "react-scripts eject"
   },
   "proxy": "http://localhost:5000/",
-  "homepage": "http://penguinjeffrey.herokuapp.com/static/test"
+  "homepage": "http://penguinjeffrey.herokuapp.com/../static/test/build/"
 }
