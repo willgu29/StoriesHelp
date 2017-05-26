@@ -45,6 +45,7 @@ class Preview extends Component {
   handleSubmit(event) {
     event.preventDefault();
     //post to preview url with sentences and urls
+    
   }
 
   render() {

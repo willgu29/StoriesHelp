@@ -30,6 +30,9 @@ class Story(Document):
     views = IntField(default=0)
     created = DateTimeField(default=datetime.now())
     isDraft = BooleanField(default=True)
+    tag = StringField(default="")
+    externalURL = StringField(default="")
+    #current tags: purpose, journey (process), relationships, self (anxiety/fear),
 
 class Request(Document):
     storyID = StringField(required=True, default="")
