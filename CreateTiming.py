@@ -1,38 +1,40 @@
 import sys
 import json
+from aeneas.exacttiming import TimeValue
 from aeneas.executetask import ExecuteTask
+from aeneas.language import Language
+from aeneas.syncmap import SyncMapFormat
 from aeneas.task import Task
+from aeneas.task import TaskConfiguration
+from aeneas.textfile import TextFragment
+from aeneas.textfile import TextFile
+from aeneas.textfile import TextFileFormat
+import aeneas.globalconstants as gc
+
+def alignTextToAudio(story):
+
+    sentences = story.sentences
+    task = Task()
+    textfile = TextFile()
+
+    for idx, sentence in enumerate(sentences):
+        f = (u'f' + str(idx))
+        fragment = TextFragment(f, Language.ENG, [sentence], [sentence])
+        textfile.add_fragment(fragment)
+
+    task.text_file = textfile
 
 
+    config = TaskConfiguration()
+    config[gc.PPN_TASK_LANGUAGE] = Language.ENG
+    config[gc.PPN_TASK_IS_TEXT_FILE_FORMAT] = TextFileFormat.PARSED
+    config[gc.PPN_TASK_OS_FILE_FORMAT] = SyncMapFormat.JSON
 
-def createTextFileFromJSON():
-    sentences = []
-    storyID = ""
-    ##re-add fileName when done test
-    with open("./story.json") as json_data:
-        story = json.load(json_data)
-        sentences = story["sentences"]
-        storyID = story['_id']["$oid"]
+    task.configuration = config
+    task.audio_file_path_absolute = 'https://www.dropbox.com/s/gubh1uplndy0whx/IDoNotMind.mp3'
+    # process Task
+    ExecuteTask(task).execute()
+    print(task.sync_map)
 
-    thefile = open("story.txt", 'w')
-    i = 0
-    for sentence in sentences:
-        i = i + 1
-        thefile.write("f%d|%s \n" %(i, sentence))
-
-    thefile.close()
-    print("DONE *** ID: ", storyID, " printed ", i, " sentences.")
-
-
-# create Task object
-config_string = u"task_language=eng|is_text_type=parsed|os_task_file_format=json"
-task = Task(config_string=config_string)
-task.audio_file_path_absolute = u"./audio.mp3"
-task.text_file_path_absolute = u"./story.txt"
-task.sync_map_file_path_absolute = u"./timings.json"
-
-# process Task
-ExecuteTask(task).execute()
-
-# output sync map to file
-task.output_sync_map_file()
+    # output sync map to file
+    # for fragment in task.sync_map_leaves():

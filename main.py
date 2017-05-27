@@ -34,6 +34,10 @@ class Story(Document):
     externalURL = StringField(default="")
     #current tags: PURPOSE, JOURNEY (process), RELATIONSHIPS, SELF (anxiety/fear),
 
+class Timings(Document):
+    storyID = ReferenceField(Story, required=True)
+    timings = ListField(DictField, required=True, default=list)
+
 class Request(Document):
     storyID = StringField(required=True, default="")
     contact = StringField(required=True, default="")
@@ -46,6 +50,10 @@ refreshDate = "2017/05/23"
 @app.route("/test")
 def test():
     return render_template("react.html")
+
+@app.route("/he")
+def trueTest():
+    return render_template("test.html", testID = "helele111")
 
 @app.route("/react")
 def react():
@@ -257,6 +265,15 @@ def generateStory():
     return render_template("saveStory.html", story = story, sentences = sentences, contents = selectedGIFS)
 
 
+import CreateTiming
+#use dis test: 59256942c3d5a2bffb7e1e77
+@app.route('/get/alignment/<id>')
+def aligment(id):
+    stories = Story.objects(id=id)
+    story = stories[0]
+    CreateTiming.alignTextToAudio(story)
+    return "Done"
+
 @app.route("/api/saved/<id>")
 def saved(id):
     return render_template('savedStory.html', storyID = id)
@@ -296,7 +313,7 @@ def getContent(contentType):
     print("query: " + text)
     if (contentType == "gifs"):
         print "gifs"
-        parts, urls, mp4s = sentenceToText.getGifsFromSentence(text, 4)
+        parts, urls, mp4s = sentenceToText.getGifsFromSentence(text, 3)
         return jsonify(urls=urls)
     elif (contentType == "pics"):
         print "pics"

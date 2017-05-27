@@ -8,8 +8,8 @@ class App extends Component {
    super(props);
    this.createSlide = this.createSlide.bind(this);
    this.state = {
-     sentences: new Array(),
-     urls: new Array()
+     sentences: [],
+     urls: []
    }
   }
   createSlide(text, url) {
@@ -141,14 +141,12 @@ class TypeStory extends Component {
    this.handleURL = this.handleURL.bind(this);
    this.refreshURLS = this.refreshURLS.bind(this);
    this.triggerChange = this.triggerChange.bind(this);
+   this.handleUpdate = this.handleUpdate.bind(this);
 
 
   }
   refreshURLS(urls) {
     this.setState( urls );
-  }
-  componentWillMount() {
-    this.timer = null;
   }
 
   handleChange(event) {
@@ -176,6 +174,14 @@ class TypeStory extends Component {
   handleURL(url){
     this.setState({url : url})
   }
+  handleUpdate(url){
+    //max 4 gifs
+    var urls = this.state.urls.slice(0, 3);
+    urls.push(url);
+    this.setState({
+      urls : urls
+    });
+  }
 
   render() {
     var showInput = (<input type="submit" value="add sentence" />)
@@ -184,7 +190,9 @@ class TypeStory extends Component {
     }
     return (
       <div>
-        <ContentViews onSelect={this.handleURL} urls={this.state.urls} ></ContentViews>
+        <ContentViews onSelect={this.handleURL}
+                      updateURLS={this.handleUpdate}
+                      urls={this.state.urls} ></ContentViews>
 
         <br />
         <br />
@@ -276,14 +284,21 @@ var resetAlignmentStyle = {
 
 
 class GifView extends Component {
-
+  constructor(props) {
+    super(props)
+    this.onClick = this.onClick.bind(this);
+  }
+  onClick(event){
+    event.preventDefault();
+    this.props.onClick(this.props.index)
+  }
   render() {
     return (
       <img className="Display-gif"
-        onClick={() => this.props.onClick()}
+        onClick={this.onClick}
         src={this.props.url}
         style={this.props.style}
-        alt="Can't load gif" />
+        alt="Can't load, make sure link is .gif" />
     );
   }
 }
@@ -302,44 +317,67 @@ class PreviewDisplay extends Component {
 class ContentViews extends Component {
   constructor(props) {
     super(props);
-    this.state = {'isSelected' : [false, false, false, false]}
+    this.state = {'isSelected' : [false, false, false, false],
+                  'text' : ''}
     this.handleSelect = this.handleSelect.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+
   }
 
   componentWillReceiveProps(nextProps) {
-    this.state = {'isSelected' : [false, false, false, false]}
+    this.state = {'isSelected' : [false, false, false, false],
+                  'text' : ''}
   }
 
-  renderURL(i, selected) {
-    var style = {}
-    if (selected) {
-      style = selectedViewStyle;
-    } else {
-      style = nonSelectedViewStyle;
-    }
+  renderURLS() {
+
     if (this.props.urls == null) {
       return (<div></div>);
     }
-    var url = this.props.urls[i];
-    if (url == null) {
-      return (<div></div>)
-    }
-    if (url.indexOf('.gif') !== -1) {
-      return (<GifView
-              url={url}
-              style={style}
-              onClick={() => this.handleSelect(i)}></GifView>);
 
-    } else if (url.indexOf(".mp4") !== -1) {
-      //is video
-    } else {
-      //is image
-      return (<div></div>);
-    }
+    var render = []
+    for (var i = 0; i < this.props.urls.length; i++) {
+      var url = this.props.urls[i];
+      var style = {};
+      if (this.state.isSelected[i]) {
+        style = selectedViewStyle;
+      } else {
+        style = nonSelectedViewStyle;
+      }
+      if (url == null) {
 
+      } else if (url.indexOf('.gif') !== -1) {
+        render.push(
+          (<GifView
+                  index={i}
+                  key={i}
+                  url={url}
+                  style={style}
+                  onClick={this.handleSelect}></GifView>)
+        )
+      } else if (url.indexOf('.mp4') !== -1) {
+
+      } else {
+        render.push(
+          (<div></div>)
+        )
+      }
+    }
+    return render;
   }
+  handleSubmit(event) {
+    event.preventDefault();
+    this.props.updateURLS(this.state.text);
+  }
+  handleChange(event) {
+    event.preventDefault();
+    this.setState({'text' : event.target.value})
+  }
+
   handleSelect(i) {
     var url = this.props.urls[i];
+    console.log(i)
     var setSelected = [false, false, false, false];
     setSelected[i] = true;
     this.setState({
@@ -355,10 +393,11 @@ class ContentViews extends Component {
 
     return (
     <div className="board-row">
-      {this.renderURL(0, this.state.isSelected[0])}
-      {this.renderURL(1, this.state.isSelected[1])}
-      {this.renderURL(2, this.state.isSelected[2])}
-      {this.renderURL(3, this.state.isSelected[3])}
+      {this.renderURLS()}
+      <form onSubmit={this.handleSubmit}>
+        Load gif link: <input type="text" onChange={this.handleChange} value={this.state.text} />
+        <input type="submit" value="load gif" />
+      </form>
     </div>
   );
   }
