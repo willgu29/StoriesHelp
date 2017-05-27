@@ -4,11 +4,11 @@ import json
 import random
 
 #used to fetch more gifs if user sentence is short or can't find any
-fill_phrases = ["You got it.", "Freedom", "Take that!", "I am god.", "That's enough already."];
+fill_phrases = ["You got it.", "Freedom", "Take that!", "I am god.", "That's enough already.", "Penguins", "Troll", "Pacman"];
 #give more variety to emotional responses
-positive_res = ["Nice", "Woo!", "Hell yeah"]
-negative_res = ["Damn", "We're fucked", "Not like this"]
-neutral_res = ["Huh", "I don't get it", "Okay"]
+positive_res = ["Nice", "Woo!", "Hell yeah", "Awesome", "No way!", "Super!", "Smile!"]
+negative_res = ["Damn", "We're fucked", "Not like this", "Shit", "Shaking my head", "I'm pissed"]
+neutral_res = ["Huh", "I don't get it", "Okay", 'Sure', 'Alright', "Not sure", "Really?"]
 
 #break sentence into parts of speech and return relevant words and phrases
 def getPartsFromSentence(sentence):
@@ -23,8 +23,6 @@ def getPartsFromSentence(sentence):
         if "VB" in pos:
             translateList.append(word)
         if "NN" in pos:
-            translateList.append(word)
-        if "JJ" in pos:
             translateList.append(word)
 
     polarity =  blob.sentiment.polarity

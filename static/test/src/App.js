@@ -14,6 +14,9 @@ class App extends Component {
      urls: []
    }
   }
+  componentDidMount() {
+    document.title = "PJ"
+  }
   createSlide(text, url) {
     var sentences = this.state.sentences;
     var urls = this.state.urls;
