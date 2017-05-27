@@ -211,7 +211,7 @@ class Tracker(object):
 
 @app.route("/render/<id>")
 def render(id):
-    storyArray = Story.objects(id=id)
+    storyArray = Story.objects(id=str(id))
     if storyArray == []:
         return render_template('home.html')
     story = storyArray[0]

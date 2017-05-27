@@ -178,6 +178,7 @@ class TypeStory extends Component {
     //max 4 gifs
     var urls = this.state.urls.slice(0, 3);
     urls.push(url);
+    this.state.url = ""
     this.setState({
       urls : urls
     });
@@ -198,9 +199,8 @@ class TypeStory extends Component {
         <br />
         <br />
       <form onSubmit={this.handleSubmit}>
-        <label>
-          <textarea value={this.state.text} onChange={this.handleChange}></textarea>
-        </label>
+
+          <textarea rows="2" cols="40" value={this.state.text} onChange={this.handleChange}></textarea>
         {showInput}
       </form>
 
@@ -328,6 +328,7 @@ class ContentViews extends Component {
   componentWillReceiveProps(nextProps) {
     this.state = {'isSelected' : [false, false, false, false],
                   'text' : ''}
+
   }
 
   renderURLS() {
