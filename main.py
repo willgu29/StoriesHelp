@@ -265,15 +265,6 @@ def generateStory():
     return render_template("saveStory.html", story = story, sentences = sentences, contents = selectedGIFS)
 
 
-import CreateTiming
-#use dis test: 59256942c3d5a2bffb7e1e77
-@app.route('/get/alignment/<id>')
-def aligment(id):
-    stories = Story.objects(id=id)
-    story = stories[0]
-    CreateTiming.alignTextToAudio(story)
-    return "Done"
-
 @app.route("/api/saved/<id>")
 def saved(id):
     return render_template('savedStory.html', storyID = id)
