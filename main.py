@@ -55,13 +55,9 @@ def test():
 def trueTest():
     return render_template("test.html", testID = "helele111")
 
-@app.route("/react")
-def react():
-    return render_template("../static/test/build/index.html")
-
 @app.route("/create")
 def create():
-    return render_template('create.html')
+    return render_template('react.html')
 
 @app.route("/")
 def home():

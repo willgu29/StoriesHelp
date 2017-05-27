@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
+import penguin from './logo.jpg';
+
 import './App.css';
 import axios from 'axios';
 
@@ -26,8 +28,8 @@ class App extends Component {
     return (
       <div className="App">
         <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
+          <img src={penguin} className="App-logo" alt="logo" />
+          <h2>Welcome to Penguin Jeffrey</h2>
         </div>
 
         <br />
@@ -135,18 +137,21 @@ class TypeStory extends Component {
    this.timer = null;
    this.state = {text : '',
                 url : '',
-                urls : []};
+                urls : [],
+                isLoading : false};
    this.handleChange = this.handleChange.bind(this);
    this.handleSubmit = this.handleSubmit.bind(this);
    this.handleURL = this.handleURL.bind(this);
    this.refreshURLS = this.refreshURLS.bind(this);
    this.triggerChange = this.triggerChange.bind(this);
    this.handleUpdate = this.handleUpdate.bind(this);
+   this.refreshGifs = this.refreshGifs.bind(this);
 
 
   }
   refreshURLS(urls) {
-    this.setState( urls );
+    this.setState({urls : urls['urls'],
+                    isLoading : false});
   }
 
   handleChange(event) {
@@ -159,16 +164,23 @@ class TypeStory extends Component {
     if (this.state.text != "") {
       this.state.url = ""
       search(this.state.text, this.refreshURLS)
+      this.setState({isLoading : true})
     }
   }
-
+  refreshGifs(event) {
+    event.preventDefault();
+    search(this.state.text, this.refreshURLS)
+    this.setState({isLoading : true})
+    //Todo show spinner/loader
+  }
   handleSubmit(event) {
    event.preventDefault();
 
    this.props.createSlide(this.state.text, this.state.url);
    this.setState({text : '',
                   url  : '',
-                  urls : []})
+                  urls : [],
+                  isLoading : false})
 
   }
   handleURL(url){
@@ -180,18 +192,27 @@ class TypeStory extends Component {
     urls.push(url);
     this.state.url = ""
     this.setState({
-      urls : urls
+      urls : urls,
+      isLoading : false
     });
   }
 
   render() {
     var showInput = (<input type="submit" value="add sentence" />)
+    var showSpinner = (<p></p>);
+
+
     if (this.state.url == ''){
       showInput = (<div></div>)
     }
+    if (this.state.isLoading) {
+      showSpinner = (<p>Loading...</p>)
+    }
     return (
       <div>
+        {showSpinner}
         <ContentViews onSelect={this.handleURL}
+                      triggerChange={this.triggerChange}
                       updateURLS={this.handleUpdate}
                       urls={this.state.urls} ></ContentViews>
 
@@ -322,6 +343,7 @@ class ContentViews extends Component {
     this.handleSelect = this.handleSelect.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.refreshGifs = this.refreshGifs.bind(this);
 
   }
 
@@ -371,6 +393,10 @@ class ContentViews extends Component {
     event.preventDefault();
     this.props.updateURLS(this.state.text);
   }
+  refreshGifs(event) {
+    event.preventDefault();
+    this.props.triggerChange();
+  }
   handleChange(event) {
     event.preventDefault();
     this.setState({'text' : event.target.value})
@@ -391,17 +417,22 @@ class ContentViews extends Component {
   }
 
   render() {
-    var form = (<div></div>);
+    var userInput = (<div></div>);
+    var showRefresh
     if (this.props.urls.length > 0) {
-      form = (<form onSubmit={this.handleSubmit}>
-          Load gif link: <input type="text" onChange={this.handleChange} value={this.state.text} />
-          <input type="submit" value="load gif" />
-          </form>)
+      userInput = (<form onSubmit={this.handleSubmit}>
+                      Load gif link: <input type="text" onChange={this.handleChange} value={this.state.text} />
+                      <input type="submit" value="load gif" />
+                    </form>)
+      showRefresh = (<form onSubmit={this.refreshGifs}>
+                          <input type="submit" value="refresh gifs" />
+                     </form>);
     }
     return (
     <div className="board-row">
+      {showRefresh} <br />
       {this.renderURLS()}
-      {form}
+      {userInput}
     </div>
   );
   }
