@@ -390,14 +390,17 @@ class ContentViews extends Component {
   }
 
   render() {
-
+    var form = (<div></div>);
+    if (this.props.urls.length > 0) {
+      form = (<form onSubmit={this.handleSubmit}>
+          Load gif link: <input type="text" onChange={this.handleChange} value={this.state.text} />
+          <input type="submit" value="load gif" />
+          </form>)
+    }
     return (
     <div className="board-row">
       {this.renderURLS()}
-      <form onSubmit={this.handleSubmit}>
-        Load gif link: <input type="text" onChange={this.handleChange} value={this.state.text} />
-        <input type="submit" value="load gif" />
-      </form>
+      {form}
     </div>
   );
   }
