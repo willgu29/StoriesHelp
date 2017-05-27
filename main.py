@@ -301,7 +301,7 @@ def getContent(contentType):
     if (contentType == "gifs"):
         print "gifs"
         parts, urls, mp4s = sentenceToText.getGifsFromSentence(text, 3)
-        return jsonify(urls=urls)
+        return jsonify(urls=mp4s)
     elif (contentType == "pics"):
         print "pics"
     elif (contentType == "vids"):

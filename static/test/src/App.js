@@ -5,6 +5,8 @@ import penguin from './logo.jpg';
 import './App.css';
 import axios from 'axios';
 
+import Preview from './Preview.js'
+
 class App extends Component {
   constructor(props) {
    super(props);
@@ -51,86 +53,6 @@ class App extends Component {
 
 
 
-class Preview extends Component {
-  constructor(props) {
-   super(props);
-   this.handleSubmit = this.handleSubmit.bind(this);
-   this.handleChange = this.handleChange.bind(this);
-   this.saveStory = this.saveStory.bind(this);
-   this.saveStatus = this.saveStatus.bind(this);
-
-   this.state = {shouldPreview : false,
-                title : ''}
-  }
-  handleSubmit(event) {
-    event.preventDefault();
-    if (this.state.shouldPreview) {
-      this.setState({shouldPreview : false})
-    } else {
-      this.setState({shouldPreview : true})
-    }
-  }
-  saveStatus(id) {
-    //if failed to save handleChange
-    //else redirect to saved page
-    window.location.href= ("/api/saved/" + id['id']);
-
-  }
-  saveStory(event) {
-    event.preventDefault();
-    saveStory(this.state.title, this.props.sentences, this.props.urls, this.saveStatus)
-  }
-  handleChange(event) {
-    this.setState({title: event.target.value});
-  }
-
-  render() {
-
-    if (this.state.shouldPreview) {
-      var display = []
-      for (var i = 0 ; i < this.props.urls.length; i++) {
-        var gifDisplay = (<PreviewDisplay url={this.props.urls[i]}
-                                          sentence={this.props.sentences[i]}>
-                                          </PreviewDisplay>);
-        display.push(gifDisplay);
-      }
-      return (
-        <div>
-          <form method="post" onSubmit={this.handleSubmit} >
-            <input type="submit" value="close preview" />
-          </form>
-          <br />
-          {display}
-          <br />
-          <br />
-          <br />
-
-          <div style={resetAlignmentStyle}>
-
-            <form method="post" action="/api/saveStory" onSubmit={this.saveStory} >
-              <input type="hidden" name="sentences" value={this.props.sentences} />
-              <input type="hidden" name="urls" value={this.props.urls} />
-              Title (optional): <input type="text" name="title"
-                          onChange={this.handleChange}
-                          value={this.state.title} />
-              <input type="submit" value="save story" />
-            </form>
-          </div>
-
-        </div>
-      );
-    } else {
-      var numberOfSlides = this.props.sentences.length;
-      return (
-        <form method="post" onSubmit={this.handleSubmit} >
-          Number of Sentences: {numberOfSlides}
-          <input type="submit" value="preview story" />
-        </form>
-
-      );
-    }
-  }
-}
 
 const WAIT_INTERVAL = 350;
 
@@ -237,15 +159,6 @@ class TypeStory extends Component {
 
 // **********  Extra Functions ---- >
 
-function saveStory(title, sentences, urls, callback) {
-  axios.post('/api/saveStory', {
-    title: title,
-    sentences: sentences,
-    urls: urls
-  }).then(checkStatus).then(returnObject).then(callback);
-
-}
-
 function search(query, callback){
   return fetch('/api/gifs?q='+query , {
     accept: 'application/json',
@@ -253,7 +166,6 @@ function search(query, callback){
   .then(parseJSON)
   .then(callback);
 }
-
 
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
@@ -266,10 +178,6 @@ function checkStatus(response) {
   throw error;
 }
 
-function returnObject(object) {
-  console.log(object)
-  return object.data;
-}
 
 function parseJSON(response) {
   console.log(response)
@@ -279,16 +187,8 @@ function parseJSON(response) {
 
 // ********** Styles --- >
 
-var alignLeftStyle = {
-  float : 'left',
-  paddingRight : "10px",
-}
 var previewGifStyle = {
   height : '100px'
-}
-
-var captionStyle = {
-  textAlign : "center",
 }
 
 var selectedViewStyle = {
@@ -298,11 +198,6 @@ var nonSelectedViewStyle = {
   border: '0px solid purple'
 }
 
-var resetAlignmentStyle = {
-  float : "none",
-  clear : "both",
-  paddingBottom : '20px'
-}
 
 // ******** Views --- >
 
@@ -327,16 +222,38 @@ class GifView extends Component {
   }
 }
 
-class PreviewDisplay extends Component {
+class VideoView extends Component {
+  constructor(props) {
+    super(props)
+    this.onClick = this.onClick.bind(this);
+    this.handleLoad = this.handleLoad.bind(this);
+    this.state = {duration : 0}
+  }
+  onClick(event){
+    event.preventDefault();
+    this.props.onClick(this.props.index)
+  }
+  handleLoad(event){
+    event.preventDefault();
+    this.setState({duration : event.target.duration})
+  }
+
   render() {
     return (
-      <div style={alignLeftStyle}>
-        <img src={this.props.url} style={previewGifStyle} />
-        <p style={captionStyle}>{this.props.sentence}</p>
+      <div className='board-row'>
+        <video  onClick={this.onClick}
+                onLoadedData={this.handleLoad}
+                ref={this.video}
+                style={this.props.style}
+                className="Display-video" autoPlay loop muted>
+          <source src={this.props.url} type="video/mp4" />
+        </video>
+        <p className="small-caption">{this.state.duration} seconds</p>
       </div>
     );
   }
 }
+
 
 class ContentViews extends Component {
   constructor(props) {
@@ -383,7 +300,14 @@ class ContentViews extends Component {
                   onClick={this.handleSelect}></GifView>)
         )
       } else if (url.indexOf('.mp4') !== -1) {
-
+        render.push(
+          (<VideoView
+                  index={i}
+                  key={i}
+                  url={url}
+                  style={style}
+                  onClick={this.handleSelect}></VideoView>)
+        )
       } else {
         render.push(
           (<div></div>)
@@ -421,9 +345,9 @@ class ContentViews extends Component {
 
   render() {
     var userInput = (<div></div>);
-    var showRefresh
+    var showRefresh = (<div></div>);
     if (this.props.urls.length > 0) {
-      userInput = (<form onSubmit={this.handleSubmit}>
+      userInput = (<form className="reset-alignment" onSubmit={this.handleSubmit}>
                       Load gif link: <input type="text" onChange={this.handleChange} value={this.state.text} />
                       <input type="submit" value="load gif" />
                     </form>)
@@ -432,11 +356,12 @@ class ContentViews extends Component {
                      </form>);
     }
     return (
-    <div className="board-row">
+    <div>
       {showRefresh} <br />
       {this.renderURLS()}
       {userInput}
     </div>
+
   );
   }
 }

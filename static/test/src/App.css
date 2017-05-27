@@ -27,3 +27,28 @@
   width: 340px;
   padding: 5px;
 }
+
+.Display-video {
+  width: 340px;
+  padding: 5px;
+}
+
+.float-left {
+  float: left;
+  padding-right: 10px;
+}
+
+.reset-alignment {
+  float: none;
+  clear: both;
+  padding-bottom: 20px;
+}
+
+.board-row {
+  display: inline-table;
+  margin: 0 auto;
+}
+
+.small-caption {
+  font-size: 12px;
+}
