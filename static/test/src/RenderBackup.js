@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import CCapture from 'ccapture.js'
 
 var videoStyle = {
   position: 'absolute',
@@ -19,7 +20,33 @@ var canvasStyle = {
 
 }
 
+//Frame by frame
+function draw(video, canvas, sentence, currentTime) {
+  if (video.paused || video.ended) {
+    return false;
+  }
+  // if (currentTime >= getSentenceTime(sentence) ) {
+  //   //triggerNext();
+  // }
 
+  var ctx = canvas.getContext("2d")
+  var width = video.videoWidth;
+  var height = video.videoHeight;
+
+  //Set background collor
+  ctx.fillStyle = "#9ea7b8";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  //Center video
+  var x =  (canvas.width/2 - width/2);
+  var y = (canvas.height/2 - height/2);
+
+  var fps = 1000 / 30
+  // currentTime = currentTime + (fps / 1000)
+
+  ctx.drawImage(video, x, y, width, height);
+  requestAnimationFrame(draw, video, canvas, sentence, currentTime);
+}
 
 function getSentenceTime(sentence) {
   var characters = sentence.length;
@@ -40,63 +67,99 @@ function getSentenceTime(sentence) {
 }
 
 
+
 //MUST be .mp4 files now
 class Render extends Component {
   constructor(props){
     super(props);
+    var capturer = new CCapture( {
+	      framerate: 30,
+      	verbose: true,
+        display: true,
+        format: 'png'
+    } );
 
-    this.state = {url : '',
+    this.state = {rendering : '',
                   sentence : '',
                   index : -1,
-                  isPlaying : false}
-    this.startVideo = this.startVideo.bind(this);
-    this.stopVideo = this.stopVideo.bind(this);
+                  isRendering : false,
+                  capturer : capturer}
+    this.handlePlay = this.handlePlay.bind(this);
+    this.startRender = this.startRender.bind(this);
+    this.cancelRender = this.cancelRender.bind(this);
     this.triggerNext = this.triggerNext.bind(this);
+    this.render = this.render.bind(this);
 
   }
-  startVideo() {
-    this.state.isPlaying = true;
-    var video = ReactDOM.findDOMNode(this.refs.video)
-    video.play();
+
+  startRender(event) {
+    event.preventDefault();
+    this.state.isRendering = true
     this.triggerNext();
+    this.state.capturer.start();
+    this.render();
+
+  }
+  cancelRender(event) {
+    event.preventDefault();
+    this.state.capturer.stop();
+    clearInterval(this.triggerNext)
+    this.state.capturer.save( function( blob ) {
+      console.log(blob)
+    } );
+    this.state.isRendering = false;
+
+  }
+  render() {
+    requestAnimationFrame(this.render);
+    var canvas = ReactDOM.findDOMNode(this.refs.canvas);
+    this.state.capturer.capture(canvas)
   }
 
-  stopVideo() {
-    clearInterval(this.triggerNext)
-    var video = ReactDOM.findDOMNode(this.refs.video)
-    video.pause();
-    this.state.isPlaying = false;
+  handlePlay() {
+    var video = ReactDOM.findDOMNode(this.refs.video);
+    var canvas = ReactDOM.findDOMNode(this.refs.canvas);
+    canvas.width = 600;
+    canvas.height = 600;
+
+
+    draw(video, canvas, this.state.sentence, 0)
   }
+
   triggerNext() {
 
-    if (this.state.index < testURLS.length - 1 && this.state.isPlaying) {
+    if (this.state.index < testURLS.length - 1 && this.state.isRendering) {
       console.log("Next video");
       var milliseconds = getSentenceTime(testURLS[this.state.index + 1]) * 1000
       setTimeout(this.triggerNext, milliseconds)
       this.setState((prevState) => {
         return {
-          url : testURLS[prevState.index + 1],
+          rendering : testURLS[prevState.index + 1],
           sentence : testSentences[prevState.index + 1],
           index: prevState.index + 1,
-          isPlaying: true
+          isRendering: true
           };
       });
 
     } else {
-      //finish video
-      // this.setState({rendering : '',
-      //                index : -1,
-      //                isPlaying: false});
+      //finish render
+      this.state.capturer.stop();
+      this.state.capturer.save();
+      this.setState({rendering : '',
+                     index : -1,
+                     isRendering: false});
     }
   }
   render() {
     return (
       <div>
-          <input type="submit" value="start video" onClick={this.startVideo} />
-          <input type="submit" value="pause video" onClick={this.stopVideo} />
-          <video loop autoPlay
-              src={this.state.url}
-              ref='video'>
+        <input onClick={this.startRender} type="submit" value="start render" />
+        <input onClick={this.cancelRender} type="submit" value="cancel render" />
+        <canvas  ref='canvas'></canvas>
+          <video autoPlay loop
+                 ref='video'
+                 onPlay={this.handlePlay}
+                 src={this.state.rendering}>
           </video>
       </div>
     )

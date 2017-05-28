@@ -49,6 +49,7 @@ class App extends Component {
 
         <br />
         <br />
+        <Render></Render>
       </div>
     );
   }
