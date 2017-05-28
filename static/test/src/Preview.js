@@ -83,6 +83,8 @@ class Preview extends Component {
       for (var i = 0 ; i < this.props.urls.length; i++) {
         var typeDisplay = (<div></div>);
         var url = this.props.urls[i];
+        //Canvas implementation can only handle .mp4
+        url = url.replace('.gif', '.mp4', 1)
         if (url.indexOf('.gif') !== -1) {
           typeDisplay = (<GifDisplay url={url}
                                           sentence={this.props.sentences[i]}>

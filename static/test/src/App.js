@@ -80,7 +80,13 @@ class TypeStory extends Component {
   }
   refreshURLS(urls) {
     console.log(urls)
-    this.setState({urls : urls['urls'],
+    //replace .gif with .mp4
+    var mp4s = []
+    for (var url in urls) {
+      url = url.replace('.gif', '.mp4', 1);
+      mp4s.push(url)
+    }
+    this.setState({urls : mp4s,
                     isLoading : false});
   }
 
@@ -114,11 +120,13 @@ class TypeStory extends Component {
 
   }
   handleURL(url){
+    url = url.replace('.gif', '.mp4', 1);
     this.setState({url : url})
   }
   handleUpdate(url){
     //max 4 gifs
     var urls = this.state.urls.slice(0, 3);
+    url = url.replace('.gif', '.mp4', 1);
     urls.push(url);
     this.state.url = ""
     this.setState({
@@ -293,6 +301,9 @@ class ContentViews extends Component {
       } else {
         style = nonSelectedViewStyle;
       }
+      //Canvas implementation can only handle .mp4
+      url = url.replace('.gif', '.mp4', 1)
+
       if (url == null) {
 
       } else if (url.indexOf('.gif') !== -1) {

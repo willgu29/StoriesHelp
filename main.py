@@ -94,12 +94,13 @@ def story(id, page):
         story.views = story.views + 1
         story.save()
     else:
-        content = story.gifURLS[page]
+        content = story.gifURLS[page].replace('.gif', '.mp4', 1)
         sentence = story.sentences[page]
 
+    gifURL = story.gifURLS[0].replace('.mp4', '.gif', 1);
     shareData = {
-        "link" : "https://penguinjeffrey.herokuapp.com/story/" + id + "/" + "0",
-        "gif" : story.gifURLS[0],
+        "link" : "https://penguinjeffrey.com/story/" + id + "/" + "0",
+        "gif" : gifURL,
         "sentence" : story.sentences[0]
     }
 
@@ -112,7 +113,7 @@ def videoStory(id):
     story = storyArray[0]
     videoURL = story.videoURL
     externalURL = story.externalURL
-    shareLink = "https://penguinjeffrey.herokuapp.com/story/" + id + "/" + "0"
+    shareLink = "https://penguinjeffrey.com/story/" + id + "/" + "0"
     return render_template("viewVideoStory.html", story = story, videoURL = videoURL,
                                                 shareLink = shareLink, externalURL = externalURL)
 
