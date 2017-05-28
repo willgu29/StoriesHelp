@@ -35,8 +35,7 @@ class VideoDisplay extends Component {
   render() {
     return (
       <div className="float-left">
-        <video style={previewVideoStyle} autoPlay loop muted>
-          <source src={this.props.url} type="video/mp4" />
+        <video style={previewVideoStyle} src={this.props.url} autoPlay loop muted>
         </video>
         <p style={captionStyle}>{this.props.sentence}</p>
       </div>

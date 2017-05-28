@@ -6,6 +6,7 @@ import './App.css';
 import axios from 'axios';
 
 import Preview from './Preview.js'
+import Render from './Render.js'
 
 class App extends Component {
   constructor(props) {
@@ -46,6 +47,9 @@ class App extends Component {
         <Preview sentences={this.state.sentences}
                   urls={this.state.urls}></Preview>
 
+        <br />
+        <br />
+        <Render></Render>
       </div>
     );
   }
@@ -75,6 +79,7 @@ class TypeStory extends Component {
 
   }
   refreshURLS(urls) {
+    console.log(urls)
     this.setState({urls : urls['urls'],
                     isLoading : false});
   }
@@ -245,8 +250,8 @@ class VideoView extends Component {
                 onLoadedData={this.handleLoad}
                 ref={this.video}
                 style={this.props.style}
-                className="Display-video" autoPlay loop muted>
-          <source src={this.props.url} type="video/mp4" />
+                className="Display-video" autoPlay loop muted
+                src={this.props.url}>
         </video>
         <p className="small-caption">{this.state.duration} seconds</p>
       </div>
@@ -273,15 +278,15 @@ class ContentViews extends Component {
 
   }
 
-  renderURLS() {
+  renderURLS(urls) {
 
-    if (this.props.urls == null) {
+    if (urls == null) {
       return (<div></div>);
     }
 
     var render = []
-    for (var i = 0; i < this.props.urls.length; i++) {
-      var url = this.props.urls[i];
+    for (var i = 0; i < urls.length; i++) {
+      var url = urls[i];
       var style = {};
       if (this.state.isSelected[i]) {
         style = selectedViewStyle;
@@ -358,7 +363,7 @@ class ContentViews extends Component {
     return (
     <div>
       {showRefresh} <br />
-      {this.renderURLS()}
+      {this.renderURLS(this.props.urls)}
       {userInput}
     </div>
 

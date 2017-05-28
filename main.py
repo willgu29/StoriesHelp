@@ -24,6 +24,8 @@ connect("extendV0", host='mongodb://penguinjeffrey:ilikefish12@ds147711.mlab.com
 class Story(Document):
     title = StringField(required=True, default="")
     sentences = ListField(StringField(), required=True, default=list)
+
+    #not necessarily .gif, may include .mp4 as well
     gifURLS = ListField(URLField(), required=True, default=list)
     videoURL = StringField(default="")
     isPublic = BooleanField(default=True)
