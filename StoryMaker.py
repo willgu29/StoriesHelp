@@ -6,10 +6,11 @@ from moviepy.editor import *
 def createMovie(id, urls, sentences):
 
     clips = []
-    for url in urls:
+    for idx, url in enumerate(urls):
+        seconds = getSentenceSeconds(sentences[idx])
         newClip = VideoFileClip(url)
         newClip = newClip.volumex(0)
-        newClip = newClip.set_duration(3)
+        newClip = newClip.set_duration(seconds)
         clips.append(newClip)
 
 
