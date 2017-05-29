@@ -60,5 +60,5 @@ def createMovie(id, urls, sentences):
     print("Final video clip")
 
     writePath = './static/uploads/'  + str(id)  + '.mp4'
-    # Write the result to a file (many options  available !)
+    # Write the result to a file (many options   available !)
     final_clip.write_videofile(writePath, fps=30, preset='veryfast',progress_bar=True,verbose=True)
