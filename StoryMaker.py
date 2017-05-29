@@ -3,26 +3,29 @@ from moviepy.editor import *
 
 
 
-def createMovie(id, urls, sentences):
-
-    clips = []
-    for idx, url in enumerate(urls):
-        seconds = getSentenceSeconds(sentences[idx])
-        newClip = VideoFileClip(url)
-        newClip = newClip.volumex(0)
-        newClip = newClip.set_duration(seconds)
-        clips.append(newClip)
 
 
 
-    final_clip = concatenate_videoclips(clips)
-    # Overlay the text clip on the first video clip
-    video = CompositeVideoClip([final_clip.set_pos('center')], size=(600,600))
+def createVideoClip(url, volume, start, out):
+    newClip = VideoFileClip(url)
+    newClip = newClip.volumex(volume)
+    newClip = newClip.set_duration(out)
+    #newClip = newClip.set_start(start)
+    return newClip
 
+def createTextClip(text, font, color, start, out):
+    newTextClip = TextClip(txt=text,
+                            font=font,
+                            fontsize=30,
+                            color=color,
+                            method="caption",
+                            align='South',
+                            size=(600, 590))
 
-    writePath = './static/uploads/'  + str(id)  + '.mp4'
-    # Write the result to a file (many options available !)
-    video.write_videofile(writePath, fps=30)
+    newTextClip = newTextClip.set_duration(out)
+    #newTextClip = newTextClip.set_start(start)
+
+    return newTextClip
 
 def getSentenceSeconds(sentence):
     characters = len(sentence)
@@ -37,3 +40,25 @@ def getSentenceSeconds(sentence):
         seconds =  4.5
 
     return (seconds + 0.2)
+
+
+def createMovie(id, urls, sentences):
+
+    clips = []
+    for idx, url in enumerate(urls):
+        print ("Creating clip: " + str(idx))
+        seconds = getSentenceSeconds(sentences[idx])
+        sentence = sentences[idx]
+        newVideo = createVideoClip(url, 0, 0, seconds)
+        newText = createTextClip(sentence, "Helvetica", 'white', 0, seconds)
+        video = CompositeVideoClip([newVideo.set_pos('center'), newText], size=(600, 600))
+        clips.append(video)
+
+
+    print("Concatenating")
+    final_clip = concatenate_videoclips(clips)
+    print("Final video clip")
+
+    writePath = './static/uploads/'  + str(id)  + '.mp4'
+    # Write the result to a file (many options available !)
+    final_clip.write_videofile(writePath, fps=30, preset='veryfast',progress_bar=True,verbose=True)
