@@ -314,21 +314,28 @@ def getContent(contentType):
         print "other"
         return []
 
+import StoryMaker
+
+
+#test: 5918d18159840b0009258fb4
 @app.route('/api/render/<id>')
 def renderAPI(id):
+    stories = Story.objects(id=id)
+    story = stories[0]
+    StoryMaker.createMovie(story.id, story.gifURLS, story.sentences)
 
-    downloadLink = "/download/"  + id + '.mp4'
-    return render_template('savedVideo', downloadLink = downloadLink)
+    filename = str(id) + '.mp4'
+    return render_template('savedVideo.html', filename=filename)
 
 
-@app.route("/download/<filePath>")
-def download(filePath):
+@app.route("/download/<filename>")
+def download(filename):
     uploads = os.path.join(current_app.root_path, 'static/uploads/')
-    pathFile = uploads + filePath
+    pathFile = uploads + filename
 
     print uploads
     print pathFile
-    return send_from_directory(directory=uploads, filename=filePath)
+    return send_from_directory(directory=uploads, filename=filename)
 
 
 
