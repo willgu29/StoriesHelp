@@ -82,7 +82,7 @@ class TypeStory extends Component {
     console.log(urls)
     //replace .gif with .mp4
     var mp4s = []
-    for (var url in urls) {
+    for (var url in urls['urls']) {
       url = url.replace('.gif', '.mp4', 1);
       mp4s.push(url)
     }
@@ -286,15 +286,15 @@ class ContentViews extends Component {
 
   }
 
-  renderURLS(urls) {
-
+  renderURLS() {
+    var urls = this.props.urls
     if (urls == null) {
       return (<div></div>);
     }
 
     var render = []
-    for (var i = 0; i < urls.length; i++) {
-      var url = urls[i];
+    for (var i = 0; i < this.props.urls.length; i++) {
+      var url = this.props.urls[i];
       var style = {};
       if (this.state.isSelected[i]) {
         style = selectedViewStyle;
@@ -374,7 +374,7 @@ class ContentViews extends Component {
     return (
     <div>
       {showRefresh} <br />
-      {this.renderURLS(this.props.urls)}
+      {this.renderURLS()}
       {userInput}
     </div>
 

@@ -25,14 +25,15 @@ function getSentenceTime(sentence) {
   var characters = sentence.length;
   var averageWordsByChar = characters/4.5;
   //2.6 = average spoken words per second
-  var base = averageWordsByChar/2.6;
+  var base = averageWordsByChar/2.2;
   var seconds = base;
-  if (base < 1.5) {
-      seconds = (seconds + 0.3);
+  if (base < 1) {
+      seconds = (seconds + 1.5);
   }
-  if (base < 0.5) {
+  if (base < 2) {
       seconds = (seconds + 0.5);
   }
+
   if (seconds > 4.5) {
       seconds =  4.5
   }
