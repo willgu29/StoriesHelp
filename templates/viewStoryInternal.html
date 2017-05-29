@@ -1,0 +1,48 @@
+
+<div id="container" style="text-align: center;">
+  <video id="video" poster="../static/images/playVideo.svg">
+
+  </video>
+</div>
+
+<script>
+var container = document.getElementById('container')
+var video  = document.getElementById('video');
+
+container.addEventListener('onclick', handleVideo, false)
+video.addEventListener('',myHandler,false);
+
+
+
+function handleVideo() {
+  if (video.playing) {
+    console.log("playing")
+  } else {
+    console.log("not playing")
+  }
+}
+
+
+function getSentenceSeconds(sentence) {
+  var characters = sentence.length;
+  var averageWordsByChar = characters/4.5;
+  //2.6 = average spoken words per second
+  var base = averageWordsByChar/2.2;
+  var seconds = base;
+  if (base < 1) {
+      seconds = (seconds + 1.5);
+  }
+  if (base < 2) {
+      seconds = (seconds + 0.5);
+  }
+
+  if (seconds > 4.5) {
+      seconds =  4.5
+  }
+  return (seconds + 0.2)
+}
+
+
+</script>
+
+<script src="../static/scripts/CCapture.all.min.js"></script>

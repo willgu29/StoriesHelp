@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import poster from './playVideo.svg';
+
 
 var videoStyle = {
   position: 'absolute',
@@ -21,7 +23,7 @@ var canvasStyle = {
 
 
 
-function getSentenceTime(sentence) {
+function getSentenceSeconds(sentence) {
   var characters = sentence.length;
   var averageWordsByChar = characters/4.5;
   //2.6 = average spoken words per second
@@ -46,61 +48,91 @@ class Render extends Component {
   constructor(props){
     super(props);
 
-    this.state = {url : '',
-                  sentence : '',
-                  index : -1,
-                  isPlaying : false}
-    this.startVideo = this.startVideo.bind(this);
-    this.stopVideo = this.stopVideo.bind(this);
-    this.triggerNext = this.triggerNext.bind(this);
+    this.state = {url : testURLS[0],
+                  sentence : testSentences[0],
+                  index : 0,
+                  isPlaying : false,
+                  autoPlay : false,
+                  elapsed: 0}
+    this.handlePlay = this.handlePlay.bind(this);
+    this.handlePause = this.handlePause.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
 
   }
-  startVideo() {
-    this.state.isPlaying = true;
-    var video = ReactDOM.findDOMNode(this.refs.video)
-    video.play();
-    this.triggerNext();
-  }
-
-  stopVideo() {
-    clearInterval(this.triggerNext)
-    var video = ReactDOM.findDOMNode(this.refs.video)
-    video.pause();
-    this.state.isPlaying = false;
-  }
-  triggerNext() {
-
-    if (this.state.index < testURLS.length - 1 && this.state.isPlaying) {
-      console.log("Next video");
-      var milliseconds = getSentenceTime(testURLS[this.state.index + 1]) * 1000
-      setTimeout(this.triggerNext, milliseconds)
-      this.setState((prevState) => {
-        return {
-          url : testURLS[prevState.index + 1],
-          sentence : testSentences[prevState.index + 1],
-          index: prevState.index + 1,
-          isPlaying: true
-          };
-      });
-
+  handleClick(event) {
+    event.preventDefault();
+    if (this.state.isPlaying) {
+      event.target.pause();
     } else {
-      //finish video
-      // this.setState({rendering : '',
-      //                index : -1,
-      //                isPlaying: false});
+      event.target.play();
     }
   }
+
+
+  handlePlay(event) {
+    event.preventDefault();
+    this.setState({
+      isPlaying : true
+    }, this.setNextVideo)
+  }
+  handlePause(event) {
+    event.preventDefault();
+    clearTimeout(this.updateVideo)
+    this.setState({
+      isPlaying : false
+    })
+  }
+  setNextVideo(){
+    console.log(this.state)
+    setTimeout(this.updateVideo, getSentenceSeconds(this.state.sentence) *1000)
+  }
+
+  handleUpdate() {
+
+  }
+  updateVideo() {
+    this.setState((prevState) => {
+      return {index: prevState.index + 1,
+              url : testURLS[prevState.index +1],
+              sentence : testSentences[prevState.index +1],
+              autoPlay : true};
+    }, this.setNextVideo);
+  }
+
   render() {
-    return (
-      <div>
-          <input type="submit" value="start video" onClick={this.startVideo} />
-          <input type="submit" value="pause video" onClick={this.stopVideo} />
-          <video loop autoPlay
-              src={this.state.url}
-              ref='video'>
-          </video>
-      </div>
-    )
+    if (this.state.autoPlay) {
+      return (
+        <div>
+            <video loop autoPlay
+                onTimeUpdate={this.handleUpdate}
+                onClick={this.handleClick}
+                onPause={this.handlePause}
+                onPlay={this.handlePlay}
+                poster={poster}
+                src={this.state.url}
+                ref='video'>
+            </video>
+            <p>{this.state.sentence}</p>
+        </div>
+      )
+    } else {
+      return (
+        <div>
+            <video loop
+                onTimeUpdate={this.handleUpdate}
+                onClick={this.handleClick}
+                onPause={this.handlePause}
+                onPlay={this.handlePlay}
+                poster={poster}
+                src={this.state.url}
+                ref='video'>
+            </video>
+            <p>{this.state.sentence}</p>
+        </div>
+      )
+    }
+
   }
 }
 

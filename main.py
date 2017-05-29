@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify, make_response, send_from_directory, redirect, url_for
+from flask import (Flask, render_template, request, jsonify, make_response,
+send_from_directory, redirect, url_for, current_app)
 
 app = Flask(__name__)
 
@@ -312,6 +313,24 @@ def getContent(contentType):
     else:
         print "other"
         return []
+
+@app.route('/api/render/<id>')
+def renderAPI(id):
+
+    downloadLink = "/download/"  + id + '.mp4'
+    return render_template('savedVideo', downloadLink = downloadLink)
+
+
+@app.route("/download/<filePath>")
+def download(filePath):
+    uploads = os.path.join(current_app.root_path, 'static/uploads/')
+    pathFile = uploads + filePath
+
+    print uploads
+    print pathFile
+    return send_from_directory(directory=uploads, filename=filePath)
+
+
 
 if __name__ == "__main__":
     app.run()
