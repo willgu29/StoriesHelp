@@ -29,3 +29,4 @@ pillow>=4.1.1
 tqdm>=4.11.2
 flask-uploads>=0.2.1
 aeneas>=1.7
+imageio>=2.2.0
