@@ -41,7 +41,7 @@
  <br />
 <h2 style="text-align:center;" id="sentence">{{ sentence }}</h2>
 
-<form style="text-align:center;" id="nextPage" action="{{ url_for('story', id = story.id, page = (count + 1) ) }}">
+<form style="text-align:center;" id="nextPage" action="{{ url_for('viewStory', id = story.id, page = (count + 1) ) }}">
 
 </form>
 

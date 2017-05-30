@@ -1,6 +1,11 @@
-<h2>We'll contact you within 24 hours :D</h2>
-<p>And present your story in a nicely wrapped british male accent.</p>
-<a href="{{url_for('home')}}">Take me home</a> <br />
 
+<h2>Share it: </h2>
+<a href="{{url_for('.viewStory', id=id, page=0)}}">View Link</a>
 
-{% extends 'analytics.html' %}
+{% if filename is defined %}
+
+  {% if filename != "" %}
+    <h2>Download it: (link will expire in 10 minutes)</h2>
+    <a href="{{url_for('download', filename = filename)}}">Download Link</a>
+  {% endif %}
+{% endif %}

@@ -65,7 +65,7 @@ class Preview extends Component {
   saveStatus(id) {
     //if failed to save handleChange
     //else redirect to saved page
-    window.location.href= ("/api/saved/" + id['id']);
+    window.location.href= ("/upload/" + id['id']);
 
   }
   saveStory(event) {

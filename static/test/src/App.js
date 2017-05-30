@@ -48,8 +48,7 @@ class App extends Component {
                   urls={this.state.urls}></Preview>
 
         <br />
-        <br />
-        <Render></Render>
+
       </div>
     );
   }
@@ -58,7 +57,7 @@ class App extends Component {
 
 
 
-const WAIT_INTERVAL = 350;
+const WAIT_INTERVAL = 500;
 
 class TypeStory extends Component {
   constructor(props) {
@@ -79,13 +78,13 @@ class TypeStory extends Component {
 
   }
   refreshURLS(urls) {
-    console.log(urls)
     //replace .gif with .mp4
     var mp4s = []
-    for (var url in urls['urls']) {
-      url = url.replace('.gif', '.mp4', 1);
+    for (var i = 0; i < urls['urls'].length; i++) {
+      var url = urls['urls'][i].replace('.gif', '.mp4')
       mp4s.push(url)
     }
+
     this.setState({urls : mp4s,
                     isLoading : false});
   }
@@ -287,8 +286,7 @@ class ContentViews extends Component {
   }
 
   renderURLS() {
-    var urls = this.props.urls
-    if (urls == null) {
+    if (this.props.urls == null) {
       return (<div></div>);
     }
 
@@ -301,9 +299,7 @@ class ContentViews extends Component {
       } else {
         style = nonSelectedViewStyle;
       }
-      //Canvas implementation can only handle .mp4
-      url = url.replace('.gif', '.mp4', 1)
-
+      //Canvas implementation can only handle .mp4 ***
       if (url == null) {
 
       } else if (url.indexOf('.gif') !== -1) {

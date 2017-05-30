@@ -1,8 +1,10 @@
 from flask import (Flask, render_template, request, jsonify, make_response,
-send_from_directory, redirect, url_for, current_app)
+send_from_directory, redirect, url_for, current_app, flash)
+from flask_uploads import UploadSet, AUDIO, configure_uploads
 
 app = Flask(__name__)
-
+app.config.from_pyfile('flask.cfg')
+app.secret_key = "this1salt1112ndksj"
 
 from ast import literal_eval
 import HTMLParser
@@ -12,7 +14,10 @@ import urllib
 import sentenceToText
 import pixabayAPI
 import convertToStory
+import CreateTiming
 import StringConversion
+import StoryMaker
+
 logo_gif_url = "https://media.giphy.com/media/VkMV9TldsPd28/giphy.gif"
 
 
@@ -39,28 +44,52 @@ class Story(Document):
 
 class Timings(Document):
     storyID = ReferenceField(Story, required=True)
-    timings = ListField(DictField, required=True, default=list)
+    fragments = ListField(DictField(), required=True, default=list)
+
+
 
 class Request(Document):
     storyID = StringField(required=True, default="")
     contact = StringField(required=True, default="")
 
-class Feedback(Document):
-    feedback = StringField(required=True, default="")
 
 refreshDate = "2017/05/23"
 
-@app.route("/test")
-def test():
-    return render_template("react.html")
 
-@app.route("/he")
-def trueTest():
-    return render_template("test.html", testID = "helele111")
 
-@app.route("/create")
-def create():
-    return render_template('react.html')
+# Configure the image uploading via Flask-Uploads
+audio = UploadSet('audio', AUDIO)
+configure_uploads(app, audio)
+@app.route('/upload/<id>', methods=['GET', 'POST'])
+def upload(id):
+    if request.method == 'POST' and 'audio' in request.files:
+        filename = audio.save(request.files['audio'])
+        storyID = str(id)
+        stories = Story.objects(id=storyID)
+        story = stories[0]
+        audioPath = './project/static/uploads/' + filename
+        print ("Audio path: " + audioPath)
+        fragments = CreateTiming.alignTextToAudio(story, audioPath)
+        timings = Timings(storyID=storyID, fragments=fragments)
+        timings.save()
+
+        StoryMaker.createMovieWithAudio(story.id,
+                                        story.gifURLS,
+                                        story.sentences,
+                                        fragments,
+                                        audioPath)
+
+        filename = str(story.id) + '.mp4'
+        return redirect(url_for('saved', id=storyID, filename=filename))
+
+    return render_template('upload.html', id=id)
+
+
+@app.route('/saved/<id>/<filename>')
+def saved(id, filename):
+    return render_template('saved.html', id=id, filename=filename)
+
+
 
 @app.route("/")
 def home():
@@ -69,19 +98,13 @@ def home():
         stories.append(story)
     return render_template('home.html', stories = stories, toDate=refreshDate)
 
-
-@app.route("/featured/<int:page>")
-def featured(page):
-    if (int(page) >= len(videoURLS)):
-        return render_template('end.html', toDate = refreshDate)
-    else:
-        return render_template('featured.html', page = page,
-                                                videoURL = videoURLS[int(page)])
-
+@app.route("/create")
+def create():
+    return render_template('react.html')
 
 
 @app.route("/story/<id>/<page>")
-def story(id, page):
+def viewStory(id, page):
     storyArray = Story.objects(id=id)
     story = storyArray[0]
     page = int(page)
@@ -265,9 +288,6 @@ def generateStory():
     return render_template("saveStory.html", story = story, sentences = sentences, contents = selectedGIFS)
 
 
-@app.route("/api/saved/<id>")
-def saved(id):
-    return render_template('savedStory.html', storyID = id)
 
 @app.route("/api/saveStory", methods=["POST"])
 def saveStoryAPI():
@@ -314,7 +334,6 @@ def getContent(contentType):
         print "other"
         return []
 
-import StoryMaker
 
 
 #test: 5918d18159840b0009258fb4

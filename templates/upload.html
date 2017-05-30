@@ -1,0 +1,29 @@
+<h2>Your story is being saved:</h2>
+<p>Add a few more details</p>
+
+<div style="text-align: center;">
+<img id="loader" src="" />
+</div>
+
+<h2>Narrate it: (this will take a few minutes, be patient) </h2>
+<form id="uploadForm" method=POST enctype=multipart/form-data action="{{ url_for('upload', id=id) }}">
+
+    <input type='file' name='audio' accept='audio/*' /> <br />
+    <input type='submit' value="upload" />
+</form>
+
+<br />
+
+<h2>Render with text:</h2>
+<a href="{{url_for('saved', id=id, filename='')}}">Skip audio</a>
+
+
+<script>
+  var uploadForm = document.getElementById('uploadForm');
+  uploadForm.addEventListener('submit',upload);
+  function upload() {
+    var loader = document.getElementById('loader');
+    loader.src = 'https://media.giphy.com/media/VkMV9TldsPd28/giphy.gif';
+  };
+
+</script>
