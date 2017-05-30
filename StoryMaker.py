@@ -29,7 +29,7 @@ def createTextClip(text, font, color, start, out):
                             size=(600, 590))
 
     newTextClip = newTextClip.set_duration(out)
-    #newTextClip = newTextClip.set_start(start)
+    #newTextClip = newTextClip.set_start(start )
 
     return newTextClip
 
