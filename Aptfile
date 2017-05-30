@@ -1,6 +1,5 @@
 libpq-dev
 deb-multimedia-keyring
-ffmpeg
 espeak
 espeak-data
 libespeak1
