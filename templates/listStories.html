@@ -1,0 +1,7 @@
+<h2>Create Text MP4:</h2>
+
+{% if stories is defined %}
+  {% for story in stories %}
+      <a href="{{url_for('.renderAPI', id = story.id)}}">{{story.title}}</a> <br />
+  {% endfor %}
+{% endif %}

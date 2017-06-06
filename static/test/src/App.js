@@ -7,14 +7,18 @@ import axios from 'axios';
 
 import Preview from './Preview.js'
 import Render from './Render.js'
+import Editor from './Editor.js'
 
 class App extends Component {
   constructor(props) {
    super(props);
    this.createSlide = this.createSlide.bind(this);
+   this.createStory = this.createStory.bind(this);
+   this.handleSelect = this.handleSelect.bind(this);
    this.state = {
      sentences: [],
-     urls: []
+     urls: [],
+     previewLoaded : false
    }
   }
   componentDidMount() {
@@ -30,31 +34,47 @@ class App extends Component {
       urls : urls
     })
   }
+  createStory(sentences, urls) {
+    this.setState({
+      sentences : sentences,
+      urls : urls,
+      previewLoaded : true
+    })
+  }
+  handleSelect(i){
+    console.log("Selected in preview: "  + i)
+  }
   render() {
-    return (
+    //        <TypeStory createSlide={this.createSlide} ></TypeStory>
+    if (this.state.previewLoaded) {
+      return (
       <div className="App">
         <div className="App-header">
           <img src={penguin} className="App-logo" alt="logo" />
           <h2>Welcome to Penguin Jeffrey</h2>
         </div>
-
-        <br />
-        <TypeStory createSlide={this.createSlide} ></TypeStory>
-
         <br />
         <br />
-        <br />
-        <Preview sentences={this.state.sentences}
+        <Preview
+                  onSelect={this.handleSelect}
+                  sentences={this.state.sentences}
                   urls={this.state.urls}></Preview>
-
-        <br />
-
       </div>
-    );
+      );
+
+    } else {
+      return (
+        <div className="App">
+          <div className="App-header">
+            <img src={penguin} className="App-logo" alt="logo" />
+            <h2>Welcome to Penguin Jeffrey</h2>
+          </div>
+          <Editor createStory={this.createStory}></Editor>
+        </div>
+      );
+    }
   }
 }
-
-
 
 
 const WAIT_INTERVAL = 500;
@@ -170,6 +190,7 @@ class TypeStory extends Component {
 
 
 // **********  Extra Functions ---- >
+
 
 function search(query, callback){
   return fetch('/api/gifs?q='+query , {

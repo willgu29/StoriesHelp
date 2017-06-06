@@ -98,6 +98,15 @@ def home():
         stories.append(story)
     return render_template('home.html', stories = stories, toDate=refreshDate)
 
+
+@app.route("/secret/all")
+def all():
+    stories = []
+    for story in Story.objects:
+        stories.append(story)
+    return render_template('listStories.html', stories = stories)
+
+
 @app.route("/create")
 def create():
     return render_template('react.html')
@@ -271,7 +280,7 @@ def render(id):
 
     return render_template('render.html', filePath = filePath, errors = errorFiles)
 
-@app.route("/generate", methods=["GET", "POST"])
+@app.route("/secret/generate", methods=["GET", "POST"])
 def generateStory():
     if (request.method == "GET"):
         return render_template("generate.html")
@@ -317,6 +326,41 @@ def saveStoryAPI():
 def getTranslate():
     sentence = request.args.get("q")
 
+@app.route('/api/generate', methods = ["POST"])
+def generateContent():
+    json = request.get_json();
+    textBlob = json['story']
+    sentences = convertToStory.convertToStoryToArray(textBlob)
+
+    selectedGIFS = []
+    rawSentences = []
+    for sentence in sentences:
+        sentenceParts, gifURLS, gifMP4S =  sentenceToText.getGifsFromSentence(sentence.raw, 1)
+        gifURL = gifMP4S[0]
+        selectedGIFS.append(gifURL)
+        rawSentences.append(sentence.raw)
+
+    return jsonify(sentences=rawSentences, urls=selectedGIFS)
+
+@app.route("/api/update", methods = ["POST"])
+def updateContent():
+    json = request.get_json();
+    sentences = json['sentences']
+    urls = json['urls']
+    selected = json['selected']
+
+    newURLS = []
+    for idx, isSelected in enumerate(selected):
+        #keep selected urls
+        if (isSelected):
+            newURLS.append(urls[idx])
+        else:
+            parts, gifURLS, mp4s = sentenceToText.getGifsFromSentence(sentences[idx], 1)
+            newURLS.append(mp4s[0])
+
+    return jsonify(sentences=sentences, urls=newURLS, selected=selected)
+
+
 
 @app.route("/api/<contentType>")
 def getContent(contentType):
@@ -341,7 +385,7 @@ def getContent(contentType):
 def renderAPI(id):
     stories = Story.objects(id=id)
     story = stories[0]
-    StoryMaker.createMovie(story.id, story.gifURLS, story.sentences)
+    StoryMaker.createMovieWithText(story.id, story.gifURLS, story.sentences)
 
     filename = str(id) + '.mp4'
     return render_template('savedVideo.html', filename=filename)

@@ -32,7 +32,7 @@ def createTextClip(text, font, color, start, out):
                             size=(600, 590))
 
     newTextClip = newTextClip.set_duration(out)
-    #newTextClip = newTextClip.set_start(start )
+    newTextClip = newTextClip.set_start(start)
 
     return newTextClip
 
@@ -68,7 +68,7 @@ def createMovieWithAudio(id, urls, sentences, fragments, audioPath):
     video = CompositeVideoClip([final_clip.set_pos('center')], size=(600, 600))
     #video.set_audio(audio.set_duration(final))
 
-    writePath = './static/uploads/'  + str(id)  + '.mp4'
+    writePath = '../CreatedStories/'  + str(id)  + '.mp4'
     # Write the result to a file (many  options available !)
     video.write_videofile(          writePath,
                                     fps=30,
@@ -84,7 +84,7 @@ def createMovieWithText(id, urls, sentences):
         print ("Creating clip: " + str(idx))
         seconds = getSentenceSeconds(sentences[idx])
         sentence = sentences[idx]
-        newVideo = createVideoClip(url, 0, 0, seconds)
+        newVideo = createVideoClip(url, 0, seconds)
         newText = createTextClip(sentence, "Helvetica", 'white', 0, seconds)
         video = CompositeVideoClip([newVideo.set_pos('center'), newText], size=(600, 600))
         clips.append(video)
@@ -94,6 +94,6 @@ def createMovieWithText(id, urls, sentences):
     final_clip = concatenate_videoclips(clips)
     print("Final video clip")
 
-    writePath = './static/uploads/'  + str(id)  + '.mp4'
+    writePath = '../CreatedStories/'  + str(id)  + '.mp4'
     # Write the result to a file (many  options available !)
     final_clip.write_videofile(writePath, fps=30, preset='veryfast',progress_bar=True,verbose=True)

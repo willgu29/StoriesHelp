@@ -21,10 +21,18 @@ var captionStyle = {
 }
 
 class GifDisplay extends Component {
+  constructor(props) {
+    super(props);
+    this.onClick = this.onClick.bind(this);
+  }
+  onClick(event){
+    event.preventDefault();
+    this.props.onClick(this.props.index)
+  }
   render() {
     return (
       <div className="float-left">
-        <img src={this.props.url} style={previewGifStyle} />
+        <img onClick={this.onClick} src={this.props.url} style={previewGifStyle} />
         <p style={captionStyle}>{this.props.sentence}</p>
       </div>
     );
@@ -32,10 +40,18 @@ class GifDisplay extends Component {
 }
 
 class VideoDisplay extends Component {
+  constructor(props) {
+    super(props);
+    this.onClick = this.onClick.bind(this);
+  }
+  onClick(event){
+    event.preventDefault();
+    this.props.onClick(this.props.index)
+  }
   render() {
     return (
       <div className="float-left">
-        <video style={previewVideoStyle} src={this.props.url} autoPlay loop muted>
+        <video onClick={this.onClick} style={previewVideoStyle} src={this.props.url} autoPlay loop muted>
         </video>
         <p style={captionStyle}>{this.props.sentence}</p>
       </div>
@@ -50,7 +66,7 @@ class Preview extends Component {
    this.handleChange = this.handleChange.bind(this);
    this.saveStory = this.saveStory.bind(this);
    this.saveStatus = this.saveStatus.bind(this);
-
+   this.handleSelect = this.handleSelect.bind(this);
    this.state = {shouldPreview : false,
                 title : ''}
   }
@@ -61,6 +77,9 @@ class Preview extends Component {
     } else {
       this.setState({shouldPreview : true})
     }
+  }
+  handleSelect(i){
+    this.props.onSelect(i)
   }
   saveStatus(id) {
     //if failed to save handleChange
@@ -86,12 +105,20 @@ class Preview extends Component {
         //Canvas implementation can only handle .mp4
         url = url.replace('.gif', '.mp4', 1)
         if (url.indexOf('.gif') !== -1) {
-          typeDisplay = (<GifDisplay url={url}
-                                          sentence={this.props.sentences[i]}>
+          typeDisplay = (<GifDisplay
+                                    index={i}
+                                    key={i}
+                                    url={url}
+                                    onClick={this.handleSelect}
+                                    sentence={this.props.sentences[i]}>
                                           </GifDisplay>);
         } else if (url.indexOf('.mp4') !== -1) {
-          typeDisplay = (<VideoDisplay url={url}
-                                       sentence={this.props.sentences[i]}>
+          typeDisplay = (<VideoDisplay
+                                      index={i}
+                                      key={i}
+                                      url={url}
+                                      onClick={this.handleSelect}
+                                      sentence={this.props.sentences[i]}>
                                           </VideoDisplay>);
         } else {
           typeDisplay = (<div></div>)
@@ -100,7 +127,7 @@ class Preview extends Component {
       }
       return (
         <div>
-          <form method="post" onSubmit={this.handleSubmit} >
+          <form className="reset-alignment" method="post" onSubmit={this.handleSubmit} >
             <input type="submit" value="close preview" />
           </form>
           <br />
@@ -123,7 +150,7 @@ class Preview extends Component {
     } else {
       var numberOfSlides = this.props.sentences.length;
       return (
-        <form method="post" onSubmit={this.handleSubmit} >
+        <form className="reset-alignment" method="post" onSubmit={this.handleSubmit} >
           Number of Sentences: {numberOfSlides}
           <input type="submit" value="preview story" />
         </form>
