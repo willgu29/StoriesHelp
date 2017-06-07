@@ -68,7 +68,7 @@ def createMovieWithAudio(id, urls, sentences, fragments, audioPath):
     video = CompositeVideoClip([final_clip.set_pos('center')], size=(600, 600))
     #video.set_audio(audio.set_duration(final))
 
-    writePath = '../CreatedStories/'  + str(id)  + '.mp4'
+    writePath = '../CreatedStories/New/'  + str(id)  + '.mp4'
     # Write the result to a file (many  options available !)
     video.write_videofile(          writePath,
                                     fps=30,
@@ -94,6 +94,6 @@ def createMovieWithText(id, urls, sentences):
     final_clip = concatenate_videoclips(clips)
     print("Final video clip")
 
-    writePath = '../CreatedStories/'  + str(id)  + '.mp4'
+    writePath = '../CreatedStories/New/'  + str(id)  + '.mp4'
     # Write the result to a file (many  options available !)
     final_clip.write_videofile(writePath, fps=30, preset='veryfast',progress_bar=True,verbose=True)

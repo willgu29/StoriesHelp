@@ -211,21 +211,6 @@ def saveStory():
     story.save()
     return render_template('savedStory.html', storyID = story.id)
 
-@app.route("/videoRequest", methods=["POST"])
-def videoRequest():
-    contact = request.form["contact"]
-    storyID = request.form["storyID"]
-    newRequest = Request(storyID=storyID, contact=contact)
-    newRequest.save()
-    return render_template("saved.html")
-
-@app.route("/feedback", methods=["POST"])
-def feedback():
-    feedback = request.form["feedback"]
-    newFeedback = Feedback(feedback=feedback)
-    newFeedback.save()
-    return render_template("feedback.html")
-
 #Experimental routes
 
 class Tracker(object):
@@ -393,7 +378,7 @@ def renderAPI(id):
 
 @app.route("/download/<filename>")
 def download(filename):
-    uploads = os.path.join(current_app.root_path, 'static/uploads/')
+    uploads = os.path.join(current_app.root_path, '../CreatedStories/New/')
     pathFile = uploads + filename
 
     print uploads
