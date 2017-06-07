@@ -25,7 +25,7 @@ logo_gif_url = "https://media.giphy.com/media/VkMV9TldsPd28/giphy.gif"
 from mongoengine import *
 from mongoengine import connect
 from datetime import *
-connect("extendV0", host='mongodb://penguinjeffrey:ilikefish12>@ds113282.mlab.com:13282/penguinjeffrey')
+connect("extendV0", host='mongodb://penguinjeffrey:ilikefish12@ds113282.mlab.com:13282/penguinjeffrey')
 
 class Story(Document):
     title = StringField(required=True, default="")
