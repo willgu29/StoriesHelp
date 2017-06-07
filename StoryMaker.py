@@ -86,7 +86,7 @@ def createMovieWithText(id, urls, sentences):
         sentence = sentences[idx]
         newVideo = createVideoClip(url, 0, seconds)
         newText = createTextClip(sentence, "Helvetica", 'white', 0, seconds)
-        video = CompositeVideoClip([newVideo.set_pos(('center', -100)), newText], size=(600, 600))
+        video = CompositeVideoClip([newVideo.set_pos('center'), newText], size=(600, 600))
         clips.append(video)
 
 
