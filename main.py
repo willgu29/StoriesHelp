@@ -84,6 +84,9 @@ def upload(id):
 
     return render_template('upload.html', id=id)
 
+@app.route('/saved/<id>')
+def savedNoFile(id):
+    return render_template('saved.html', id=id)
 
 @app.route('/saved/<id>/<filename>')
 def saved(id, filename):
