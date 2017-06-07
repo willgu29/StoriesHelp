@@ -2,6 +2,7 @@ build-essential
 espeak
 espeak-data
 flac
+ffmpeg
 libasound2-dev
 libespeak-dev
 libespeak1
