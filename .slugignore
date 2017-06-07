@@ -1,0 +1,6 @@
+/static/test/public/*
+/static/test/src/*
+/static/test/node_modules/*
+
+# misc
+.DS_Store
