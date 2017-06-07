@@ -1,5 +1,0 @@
-wordnet
-movie_reviews
-punkt
-brown
-averaged_perceptron_tagger
