@@ -24,3 +24,4 @@ olefile>=0.44
 pillow>=4.1.1
 tqdm>=4.11.2
 flask-uploads>=0.2.1
+aeneas>=1.7
