@@ -1,0 +1,5 @@
+wordnet
+movie_reviews
+punkt
+brown
+averaged_percepton_tagger
