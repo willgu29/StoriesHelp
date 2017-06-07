@@ -1,4 +1,6 @@
-
+#Import everything needed to edit video clips
+import imageio
+imageio.plugins.ffmpeg.download()
 
 from moviepy.editor import *
 from moviepy.video.fx.all import loop
