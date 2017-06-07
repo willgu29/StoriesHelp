@@ -11,6 +11,7 @@ class Editor extends Component {
     this.keepViews = this.keepViews.bind(this);
     this.updated = this.updated.bind(this);
     this.createStory = this.createStory.bind(this);
+    this.replaceURL = this.replaceURL.bind(this);
     this.state = {
       selected : [],
       isRefreshing : false,
@@ -43,11 +44,20 @@ class Editor extends Component {
   createStory(){
     this.props.createStory(this.state.sentences, this.state.urls)
   }
+  replaceURL(url, index){
+    var urls = this.state.urls;
+    url = url.replace('.gif', '.mp4', 1);
+    urls[index] = url;
+    this.setState({
+      urls : urls
+    })
+  }
   render() {
     var showTimeline = (<div></div>)
     var showLoader = (<p></p>)
     if (this.state.isLoaded) {
       showTimeline = (<Timeline
+                                replaceURL={this.replaceURL}
                                 createStory={this.createStory}
                                 refresh={this.keepViews}
                                 sentences={this.state.sentences}
@@ -75,19 +85,22 @@ class Timeline extends Component {
     this.handleSelect = this.handleSelect.bind(this);
     this.handleRefresh = this.handleRefresh.bind(this);
     this.handleLoad = this.handleLoad.bind(this);
+    this.updateURL = this.updateURL.bind(this);
     this.state = {
       selected : new Array(this.props.sentences.length).fill(false),
-      allSelected : false
+      allSelected : false,
+      lastSelected : -1
     }
   }
 
-  handleSelect(i){
+  handleSelect(index){
     var selected = this.state.selected;
-    var isSelected = selected[i];
+    var isSelected = selected[index];
+    var lastSelected = index;
     if (isSelected) {
-      selected[i] = false;
+      selected[index] = false;
     } else {
-      selected[i] = true;
+      selected[index] = true;
     }
     for (var i = 0; i < selected.length; i++) {
       if (selected[i]) {
@@ -95,7 +108,8 @@ class Timeline extends Component {
       } else {
         this.setState({
           selected : selected,
-          allSelected : false
+          allSelected : false,
+          lastSelected : lastSelected
         });
         return;
       }
@@ -103,7 +117,8 @@ class Timeline extends Component {
 
     this.setState({
       selected : selected,
-      allSelected : true
+      allSelected : true,
+      lastSelected : lastSelected
     })
 
 
@@ -116,6 +131,9 @@ class Timeline extends Component {
     event.preventDefault();
     this.props.createStory();
   }
+  updateURL(url){
+    this.props.replaceURL(url, this.state.lastSelected)
+  }
   render() {
     var views = loadViews(  this.props.sentences,
                             this.props.urls,
@@ -125,8 +143,10 @@ class Timeline extends Component {
     var showSave = (<div></div>)
     var showRefresh = (<input type="submit" value="refresh gifs"
                               onClick={this.handleRefresh} />)
+    var showLoad = (<InsertVideo updateURL={this.updateURL}></InsertVideo>)
     if (this.state.allSelected) {
       showRefresh = (<div></div>)
+      showLoad = (<div></div>)
       showSave = (<input type="submit" value="load story"
                          onClick={this.handleLoad} />)
     }
@@ -136,11 +156,42 @@ class Timeline extends Component {
         <div>
           {views}
         </div>
+        {showLoad}
         {showSave}
       </div>
     );
   }
 }
+
+class InsertVideo extends Component {
+  constructor(props){
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.state = {
+      text : ''
+    }
+  }
+  handleSubmit(event){
+    event.preventDefault();
+    this.props.updateURL(this.state.text)
+  }
+  handleChange(event){
+    event.preventDefault();
+    this.setState({
+      text : event.target.value
+    })
+  }
+  render() {
+    return(
+      <form className="reset-alignment" onSubmit={this.handleSubmit}>
+        Load gif link: <input type="text" onChange={this.handleChange} value={this.state.text} />
+        <input type="submit" value="load gif" />
+      </form>
+    );
+  }
+}
+
 
 var selectedViewStyle = {
   border: '3px solid purple',
@@ -179,11 +230,11 @@ class VideoDisplay extends Component {
 function loadViews(sentences, urls, selected, onClickCallback){
 
   var display = []
-  for (var i = 0 ; i < urls.length; i++) {
+  for (var i = 0 ; i < sentences.length; i++) {
     var typeDisplay = (<div></div>);
     var url = urls[i];
     url = url.replace('.gif', '.mp4', 1)
-    if (url.indexOf('.mp4') !== -1) {
+    //if (url.indexOf('.mp4') !== -1) {
       typeDisplay = (<VideoDisplay
                                   index={i}
                                   key={i}
@@ -192,9 +243,9 @@ function loadViews(sentences, urls, selected, onClickCallback){
                                   onClick={onClickCallback}
                                   sentence={sentences[i]}>
                                       </VideoDisplay>);
-    } else {
-      typeDisplay = (<div></div>)
-    }
+    //} else {
+    ///  typeDisplay = (<div></div>)
+    //}
     display.push(typeDisplay);
   }
   return display;

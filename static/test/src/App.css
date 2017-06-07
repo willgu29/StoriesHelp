@@ -56,6 +56,8 @@
 
 .caption {
   text-align: center;
+  width: 300px;
+  padding: 5px;
 }
 
 .small-caption {
