@@ -16,9 +16,7 @@ six==1.10.0
 pymongo>=2.7.1
 python-dateutil>=2.6.0
 mongoengine>= 0.13.0
-gTTS>=1.2.0
 BeautifulSoup4>=4.5.1
-lxml>=3.6.0
 numpy>=1.11.3
 decorator>=4.0.11
 imageio>=2.2.0
