@@ -114,6 +114,9 @@ def all():
 def create():
     return render_template('react.html')
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 @app.route("/story/<id>/<page>")
 def viewStory(id, page):
