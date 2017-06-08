@@ -14,7 +14,7 @@ class App extends Component {
    super(props);
    this.createSlide = this.createSlide.bind(this);
    this.createStory = this.createStory.bind(this);
-   this.handleSelect = this.handleSelect.bind(this);
+   this.handleEdit = this.handleEdit.bind(this);
    this.state = {
      sentences: [],
      urls: [],
@@ -35,14 +35,20 @@ class App extends Component {
     })
   }
   createStory(sentences, urls) {
+    var thisSentences = this.state.sentences;
+    var thisUrls = this.state.urls;
+    thisSentences.push.apply(thisSentences, sentences);
+    thisUrls.push.apply(thisUrls, urls);
     this.setState({
-      sentences : sentences,
-      urls : urls,
+      sentences : thisSentences,
+      urls : thisUrls,
       previewLoaded : true
     })
   }
-  handleSelect(i){
-    console.log("Selected in preview: "  + i)
+  handleEdit(){
+    this.setState({
+      previewLoaded : false
+    })
   }
   render() {
     //        <TypeStory createSlide={this.createSlide} ></TypeStory>
@@ -55,8 +61,10 @@ class App extends Component {
         </div>
         <br />
         <br />
+
+
         <Preview
-                  onSelect={this.handleSelect}
+                  onEdit={this.handleEdit}
                   sentences={this.state.sentences}
                   urls={this.state.urls}></Preview>
       </div>

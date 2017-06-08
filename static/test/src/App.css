@@ -54,6 +54,23 @@
   margin: 0 auto;
 }
 
+.view-border {
+  border: 3px solid black;
+  width: 600px;
+  display: inline-table;
+  margin: 0 auto;
+}
+
+.view-story {
+  height: 350px;
+  max-width: 600px;
+  padding: 5px;
+}
+.view-caption {
+  text-align: center;
+  padding: 5px;
+}
+
 .caption {
   text-align: center;
   width: 300px;

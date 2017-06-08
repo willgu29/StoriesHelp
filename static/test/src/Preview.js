@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 
+import Player from './Player.js'
+
 var resetAlignmentStyle = {
   float : "none",
   clear : "both",
@@ -16,9 +18,6 @@ var previewVideoStyle = {
   height : '100px'
 }
 
-var captionStyle = {
-  textAlign : "center",
-}
 
 class GifDisplay extends Component {
   constructor(props) {
@@ -33,7 +32,7 @@ class GifDisplay extends Component {
     return (
       <div className="float-left">
         <img onClick={this.onClick} src={this.props.url} style={previewGifStyle} />
-        <p style={captionStyle}>{this.props.sentence}</p>
+        <p className="caption">{this.props.sentence}</p>
       </div>
     );
   }
@@ -53,7 +52,7 @@ class VideoDisplay extends Component {
       <div className="float-left">
         <video onClick={this.onClick} style={previewVideoStyle} src={this.props.url} autoPlay loop muted>
         </video>
-        <p style={captionStyle}>{this.props.sentence}</p>
+        <p className='caption'>{this.props.sentence}</p>
       </div>
     );
   }
@@ -67,6 +66,7 @@ class Preview extends Component {
    this.saveStory = this.saveStory.bind(this);
    this.saveStatus = this.saveStatus.bind(this);
    this.handleSelect = this.handleSelect.bind(this);
+   this.editStory = this.editStory.bind(this);
    this.state = {shouldPreview : false,
                 title : ''}
   }
@@ -91,6 +91,10 @@ class Preview extends Component {
     event.preventDefault();
     saveStory(this.state.title, this.props.sentences, this.props.urls, this.saveStatus)
   }
+  editStory(event){
+    event.preventDefault();
+    this.props.onEdit();
+  }
   handleChange(event) {
     this.setState({title: event.target.value});
   }
@@ -98,33 +102,13 @@ class Preview extends Component {
   render() {
 
     if (this.state.shouldPreview) {
-      var display = []
-      for (var i = 0 ; i < this.props.urls.length; i++) {
-        var typeDisplay = (<div></div>);
-        var url = this.props.urls[i];
-        //Canvas implementation can only handle .mp4
-        url = url.replace('.gif', '.mp4', 1)
-        if (url.indexOf('.gif') !== -1) {
-          typeDisplay = (<GifDisplay
-                                    index={i}
-                                    key={i}
-                                    url={url}
-                                    onClick={this.handleSelect}
-                                    sentence={this.props.sentences[i]}>
-                                          </GifDisplay>);
-        } else if (url.indexOf('.mp4') !== -1) {
-          typeDisplay = (<VideoDisplay
-                                      index={i}
-                                      key={i}
-                                      url={url}
-                                      onClick={this.handleSelect}
-                                      sentence={this.props.sentences[i]}>
-                                          </VideoDisplay>);
-        } else {
-          typeDisplay = (<div></div>)
-        }
-        display.push(typeDisplay);
-      }
+
+      var display = (<Player
+                            sentences={this.props.sentences}
+                            urls={this.props.urls}
+                            ></Player>);
+
+
       return (
         <div>
           <form className="reset-alignment" method="post" onSubmit={this.handleSubmit} >
@@ -149,15 +133,48 @@ class Preview extends Component {
       );
     } else {
       var numberOfSlides = this.props.sentences.length;
+      var duration = getVideoDuration(this.props.sentences);
       return (
+        <div>
+        <input type="submit" value="add more sentences" onClick={this.editStory}/>
+        <br /> <br /> <br /> <br />
         <form className="reset-alignment" method="post" onSubmit={this.handleSubmit} >
-          Number of Sentences: {numberOfSlides}
+          Number of Sentences: {numberOfSlides} <br />
+          Length of Video: {duration.toFixed(2)} seconds<br />
+          <br />
           <input type="submit" value="preview story" />
         </form>
+        </div>
 
       );
     }
   }
+}
+
+
+
+
+function loadViews(sentences, urls, onClickCallback){
+
+  var display = []
+  for (var i = 0 ; i < sentences.length; i++) {
+    var typeDisplay = (<div></div>);
+    var url = urls[i];
+    url = url.replace('.gif', '.mp4', 1)
+    //if (url.indexOf('.mp4') !== -1) {
+      typeDisplay = (<VideoDisplay
+                                  index={i}
+                                  key={i}
+                                  url={url}
+                                  onClick={onClickCallback}
+                                  sentence={sentences[i]}>
+                                      </VideoDisplay>);
+    //} else {
+    ///  typeDisplay = (<div></div>)
+    //}
+    display.push(typeDisplay);
+  }
+  return display;
 }
 
 
@@ -184,6 +201,33 @@ function checkStatus(response) {
 function returnObject(object) {
   console.log(object)
   return object.data;
+}
+
+function getVideoDuration(sentences){
+  var seconds = 0;
+  for (var i = 0; i < sentences.length; i++) {
+    var clipLength = getSentenceSeconds(sentences[i]);
+    seconds = seconds + clipLength;
+  }
+  return seconds;
+}
+
+function getSentenceSeconds(sentence){
+  var characters = sentence.length;
+  var averageWordsByChar = characters/4.5;
+  var base = averageWordsByChar/2.2;
+  var seconds = base;
+  if (base < 1) {
+    seconds = (seconds + 1.5);
+  }
+  if (base < 2) {
+    seconds = (seconds + 0.5);
+  }
+  if (seconds > 4.5) {
+    seconds = 4.5;
+  }
+
+  return (seconds + 0.2);
 }
 
 

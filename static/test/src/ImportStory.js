@@ -35,7 +35,9 @@ class ImportStory extends Component {
   render() {
     var showInput = (<input type="submit" value="generate story" />)
     var showSpinner = (<p></p>);
+    var showGuide = (<p>Copy and paste your story here.</p>);
     if (this.state.isLoading) {
+      showGuide = (<div></div>);
       showSpinner = (<p>Loading... this may take a minute or two</p>);
     }
     if (this.state.isLoaded) {
@@ -46,8 +48,8 @@ class ImportStory extends Component {
     }
     return (
       <div>
-
       {showSpinner}
+      {showGuide}
       <form onSubmit={this.handleSubmit}>
           <textarea rows="20" cols="80" value={this.state.text} onChange={this.handleChange}></textarea>
           <br />

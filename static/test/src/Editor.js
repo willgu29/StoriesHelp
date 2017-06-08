@@ -144,14 +144,17 @@ class Timeline extends Component {
     var showRefresh = (<input type="submit" value="refresh gifs"
                               onClick={this.handleRefresh} />)
     var showLoad = (<InsertVideo updateURL={this.updateURL}></InsertVideo>)
+    var showGuide = (<p>Click video clips that represent the sentence. Refresh the rest. Repeat.</p>)
     if (this.state.allSelected) {
       showRefresh = (<div></div>)
       showLoad = (<div></div>)
       showSave = (<input type="submit" value="load story"
                          onClick={this.handleLoad} />)
+      showGuide = (<p>Go ahead and load it.</p>)
     }
     return(
       <div>
+        {showGuide}
         {showRefresh}
         <div>
           {views}
