@@ -86,10 +86,13 @@ class Timeline extends Component {
     this.handleRefresh = this.handleRefresh.bind(this);
     this.handleLoad = this.handleLoad.bind(this);
     this.updateURL = this.updateURL.bind(this);
+    this.handleRightClick = this.handleRightClick.bind(this);
+    this.handleHide = this.handleHide.bind(this);
+
     this.state = {
       selected : new Array(this.props.sentences.length).fill(false),
       allSelected : false,
-      lastSelected : -1
+      lastSelected : -1,
     }
   }
 
@@ -133,17 +136,37 @@ class Timeline extends Component {
   }
   updateURL(url){
     this.props.replaceURL(url, this.state.lastSelected)
+    this.setState({
+      showInput : false,
+      lastSelected : -1
+    })
+  }
+  handleRightClick(index){
+    this.setState({
+      showInput : true,
+      lastSelected : index
+    })
+
+  }
+  handleHide(){
+    this.setState({
+      showInput : false,
+      lastSelected : -1
+    })
   }
   render() {
     var views = loadViews(  this.props.sentences,
                             this.props.urls,
                             this.state.selected,
-                            this.handleSelect);
+                            this.state.showInput,
+                            this.state.lastSelected,
+                            this.handleSelect,
+                            this.handleRightClick);
 
     var showSave = (<div></div>)
     var showRefresh = (<input type="submit" value="refresh gifs"
                               onClick={this.handleRefresh} />)
-    var showLoad = (<InsertVideo updateURL={this.updateURL}></InsertVideo>)
+    var showLoad = (<div></div>)
     var showGuide = (<p>Click video clips that represent the sentence. Refresh the rest. Repeat.</p>)
     if (this.state.allSelected) {
       showRefresh = (<div></div>)
@@ -151,6 +174,10 @@ class Timeline extends Component {
       showSave = (<input type="submit" value="load story"
                          onClick={this.handleLoad} />)
       showGuide = (<p>Go ahead and load it.</p>)
+    }
+    if (this.state.showInput) {
+      showLoad = (<InsertVideo  updateURL={this.updateURL}
+                                hideInput={this.handleHide}></InsertVideo>)
     }
     return(
       <div>
@@ -171,13 +198,16 @@ class InsertVideo extends Component {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
     this.state = {
       text : ''
     }
   }
   handleSubmit(event){
     event.preventDefault();
-    this.props.updateURL(this.state.text)
+    var url = this.state.text;
+    url.replace('.gif', '.mp4', 1);
+    this.props.updateURL(url)
   }
   handleChange(event){
     event.preventDefault();
@@ -185,11 +215,15 @@ class InsertVideo extends Component {
       text : event.target.value
     })
   }
+  handleClick(event){
+    this.props.hideInput();
+  }
   render() {
     return(
       <form className="reset-alignment" onSubmit={this.handleSubmit}>
-        Load gif link: <input type="text" onChange={this.handleChange} value={this.state.text} />
-        <input type="submit" value="load gif" />
+        <input type="submit" value="cancel" onClick={this.handleClick} />
+        Load video link: <input type="text" onChange={this.handleChange} value={this.state.text} />
+        <input type="submit" value="load video" />
       </form>
     );
   }
@@ -202,26 +236,38 @@ var selectedViewStyle = {
 var nonSelectedViewStyle = {
   border: '0px solid purple',
 }
+var rightClickViewStyle = {
+  border: '3px solid blue'
+}
 
 class VideoDisplay extends Component {
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);
+    this.onRightClick = this.onRightClick.bind(this);
   }
   onClick(event){
     event.preventDefault();
     this.props.onClick(this.props.index)
+  }
+  onRightClick(event){
+    event.preventDefault();
+    this.props.onRightClick(this.props.index)
+
   }
   render() {
     var selected = nonSelectedViewStyle;
     if (this.props.selected) {
       selected = selectedViewStyle;
     }
-
+    if (this.props.isRight) {
+      selected = rightClickViewStyle
+    }
     return (
       <div className="board-row">
         <video className="Editor-video"
                 onClick={this.onClick}
+                onContextMenu={this.onRightClick}
                 style={selected} src={this.props.url} autoPlay loop muted>
         </video>
         <p className='caption'>{this.props.sentence}</p>
@@ -230,12 +276,16 @@ class VideoDisplay extends Component {
   }
 }
 
-function loadViews(sentences, urls, selected, onClickCallback){
+function loadViews(sentences, urls, selected, isRight, lastSelected, onClickCallback, onRightCallback){
 
   var display = []
   for (var i = 0 ; i < sentences.length; i++) {
     var typeDisplay = (<div></div>);
     var url = urls[i];
+    var blueBorder = false;
+    if (isRight && i == lastSelected){
+      blueBorder = true;
+    }
     url = url.replace('.gif', '.mp4', 1)
     //if (url.indexOf('.mp4') !== -1) {
       typeDisplay = (<VideoDisplay
@@ -243,6 +293,8 @@ function loadViews(sentences, urls, selected, onClickCallback){
                                   key={i}
                                   url={url}
                                   selected={selected[i]}
+                                  isRight={blueBorder}
+                                  onRightClick={onRightCallback}
                                   onClick={onClickCallback}
                                   sentence={sentences[i]}>
                                       </VideoDisplay>);
