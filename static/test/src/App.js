@@ -15,6 +15,7 @@ class App extends Component {
    this.createSlide = this.createSlide.bind(this);
    this.createStory = this.createStory.bind(this);
    this.handleEdit = this.handleEdit.bind(this);
+   this.handleClick = this.handleClick.bind(this);
    this.state = {
      sentences: [],
      urls: [],
@@ -50,13 +51,20 @@ class App extends Component {
       previewLoaded : false
     })
   }
+  handleClick(event){
+    event.preventDefault();
+    //app logo clicked, go home.
+    if (window.confirm("Return home? You'll lose all your progress.")){
+      window.location.href = ('/');
+    }
+  }
   render() {
     //        <TypeStory createSlide={this.createSlide} ></TypeStory>
     if (this.state.previewLoaded) {
       return (
       <div className="App">
         <div className="App-header">
-          <img src={penguin} className="App-logo" alt="logo" />
+          <img src={penguin} onClick={this.handleClick} className="App-logo" alt="logo" />
           <h2>Welcome to Penguin Jeffrey</h2>
         </div>
         <br />
@@ -74,7 +82,7 @@ class App extends Component {
       return (
         <div className="App">
           <div className="App-header">
-            <img src={penguin} className="App-logo" alt="logo" />
+            <img src={penguin} onClick={this.handleClick} className="App-logo" alt="logo" />
             <h2>Welcome to Penguin Jeffrey</h2>
           </div>
           <Editor createStory={this.createStory}></Editor>

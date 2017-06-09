@@ -1,21 +1,30 @@
-<h2>Your story is being saved:</h2>
-<p>Add a few more details</p>
+<h2>Your story is saved:</h2>
 
 <div style="text-align: center;">
 <img id="loader" src="" />
 </div>
 
+<!-- Audio alignment service
 <h2>Narrate it: (this will take a few minutes, be patient) </h2>
 <form id="uploadForm" method=POST enctype=multipart/form-data action="{{ url_for('upload', id=id) }}">
 
     <input type='file' name='audio' accept='audio/*' /> <br />
     <input type='submit' value="upload" />
 </form>
+-->
+<br />
+
+<h2>Render with text: (this will take a few minutes, be patient)</h2>
+<form id="uploadForm" method=POST action="{{ url_for('renderAPI', id=id) }}">
+    <input type='submit' value="create mp4" />
+</form>
+
 
 <br />
 
-<h2>Render with text:</h2>
-<a href="{{url_for('savedNoFile', id=id)}}">Skip audio</a>
+<h2>Skip rendering: (get a share link)</h2>
+<a href="{{url_for('savedNoFile', id=id)}}">Skip rendering</a>
+
 
 
 <script>

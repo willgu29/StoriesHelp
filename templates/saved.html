@@ -6,6 +6,6 @@
 
   {% if filename != "" %}
     <h2>Download it: (link will expire in 10 minutes)</h2>
-    <a href="{{url_for('download', filename = filename)}}">Download Link</a>
+    <a href="{{url_for('download', filename = filename)}}" download>Download Link</a>
   {% endif %}
 {% endif %}

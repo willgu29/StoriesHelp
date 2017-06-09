@@ -372,13 +372,17 @@ def getContent(contentType):
 
 
 #test: 5918d18159840b0009258fb4
-@app.route('/api/render/<id>')
+@app.route('/api/render/<id>', methods= ["GET", "POST"])
 def renderAPI(id):
     stories = Story.objects(id=id)
     story = stories[0]
     StoryMaker.createMovieWithText(story.id, story.gifURLS, story.sentences)
-
     filename = str(id) + '.mp4'
+
+    if request.method == "POST":
+        return redirect(url_for('saved', id=story.id, filename=filename))
+
+
     return render_template('savedVideo.html', filename=filename)
 
 
