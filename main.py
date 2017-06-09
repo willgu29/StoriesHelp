@@ -18,6 +18,7 @@ import CreateTiming
 import StringConversion
 import StoryMaker
 
+
 logo_gif_url = "https://media.giphy.com/media/VkMV9TldsPd28/giphy.gif"
 
 
@@ -92,6 +93,9 @@ def savedNoFile(id):
 def saved(id, filename):
     return render_template('saved.html', id=id, filename=filename)
 
+@app.route('/test')
+def test():
+    return render_template('viewStoryInternal.html')
 
 
 @app.route("/")
@@ -117,6 +121,8 @@ def create():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+
 
 @app.route("/story/<id>/<page>")
 def viewStory(id, page):
@@ -313,9 +319,17 @@ def saveStoryAPI():
 
 
 
-@app.route("/api/translate")
-def getTranslate():
-    sentence = request.args.get("q")
+@app.route("/api/sentences", methods = ["POST"])
+def getSentences():
+    json = request.get_json();
+    textBlob = json['story']
+    sentences = convertToStory.convertToStoryToArray(textBlob)
+    rawSentences = []
+    for sentence in sentences:
+        rawSentences.append(sentence.raw)
+
+    return jsonify(sentences=rawSentences)
+
 
 @app.route('/api/generate', methods = ["POST"])
 def generateContent():

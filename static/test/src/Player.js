@@ -90,6 +90,4 @@ function getSentenceSeconds(sentence){
   return (seconds + 0.2);
 }
 
-
-
 export default Player;

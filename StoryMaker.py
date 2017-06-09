@@ -50,6 +50,10 @@ def getSentenceSeconds(sentence):
 
     return (seconds + 0.2)
 
+def credits():
+    credits = VideoFileClip('../CreatedStories/Credits/Made_ByPJ.mp4')
+    return credits
+
 def createMovieWithAudio(id, urls, sentences, fragments, audioPath):
     clips = []
     for idx, url in enumerate(urls):
@@ -60,7 +64,7 @@ def createMovieWithAudio(id, urls, sentences, fragments, audioPath):
         newVideo = createVideoClip(url, 0, seconds)
         clips.append(newVideo)
 
-
+    clips.append(credits())
     print("Concatenating")
     final_clip = concatenate_videoclips(clips)
     #audio = AudioFileClip(audioPath)
@@ -89,7 +93,7 @@ def createMovieWithText(id, urls, sentences):
         video = CompositeVideoClip([newVideo.set_pos('center'), newText], size=(600, 600))
         clips.append(video)
 
-
+    clips.append(credits())
     print("Concatenating")
     final_clip = concatenate_videoclips(clips)
     print("Final video clip")
