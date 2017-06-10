@@ -4,13 +4,15 @@ imageio.plugins.ffmpeg.download()
 
 from moviepy.editor import *
 from moviepy.video.fx.all import loop
+from moviepy.video.fx.all import crop
 from moviepy.audio.AudioClip import AudioClip
 import CreateTiming
 
 
 def createVideoClip(url, start, out):
     newClip = VideoFileClip(url)
-    newClip = newClip.resize(width=600)
+    newClip = newClip.resize(width=640)
+    newClip = newClip.crop(y2=360)
     newClip = newClip.volumex(0)
     newClip = clipToDuration(newClip, (out-start))
     newClip = newClip.set_start(start)
@@ -25,11 +27,11 @@ def clipToDuration(clip, targetSeconds):
 def createTextClip(text, font, color, start, out):
     newTextClip = TextClip(txt=text,
                             font=font,
-                            fontsize=30,
+                            fontsize=24,
                             color=color,
                             method="caption",
                             align='South',
-                            size=(600, 590))
+                            size=(620, 80))
 
     newTextClip = newTextClip.set_duration(out)
     newTextClip = newTextClip.set_start(start)
@@ -50,6 +52,7 @@ def getSentenceSeconds(sentence):
 
     return (seconds + 0.2)
 
+#TODO: Create 640x480 version
 def credits():
     credits = VideoFileClip('../CreatedStories/Credits/Made_ByPJ.mp4')
     return credits
@@ -69,7 +72,7 @@ def createMovieWithAudio(id, urls, sentences, fragments, audioPath):
     final_clip = concatenate_videoclips(clips)
     #audio = AudioFileClip(audioPath)
     print("Final video clip")
-    video = CompositeVideoClip([final_clip.set_pos('center')], size=(600, 600))
+    video = CompositeVideoClip([final_clip.set_pos('center')], size=(640, 480))
     #video.set_audio(audio.set_duration(final))
 
     writePath = '../CreatedStories/New/'  + str(id)  + '.mp4'
@@ -90,7 +93,8 @@ def createMovieWithText(id, urls, sentences):
         sentence = sentences[idx]
         newVideo = createVideoClip(url, 0, seconds)
         newText = createTextClip(sentence, "Helvetica", 'white', 0, seconds)
-        video = CompositeVideoClip([newVideo.set_pos('center'), newText], size=(600, 600))
+        video = CompositeVideoClip([newVideo.set_pos('center'), newText.set_pos((('center'), ('bottom')))],
+                                    size=(640, 480))
         clips.append(video)
 
     clips.append(credits())
