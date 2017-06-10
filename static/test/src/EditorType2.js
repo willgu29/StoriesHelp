@@ -69,7 +69,7 @@ class EditorType2 extends Component {
     } else {
 
       var showSpinner = (<p></p>);
-      var showGuide = (<p>Copy and paste your story here.</p>);
+      var showGuide = (<p>Tell your story here:</p>);
       var showInput = (<input type="submit" value="create story" />)
 
       if (this.state.isLoading) {

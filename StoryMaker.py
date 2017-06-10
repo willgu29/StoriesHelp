@@ -52,9 +52,14 @@ def getSentenceSeconds(sentence):
 
     return (seconds + 0.2)
 
-#TODO: Create 640x480 version
+
 def credits():
-    credits = VideoFileClip('../CreatedStories/Credits/Made_ByPJ.mp4')
+    penguin = VideoFileClip('../CreatedStories/Credits/penguin.mp4')
+    penguin = clipToDuration(penguin, 2)
+    paper = ImageClip('../CreatedStories/Credits/paper.jpg', duration=2)
+    madeBy = createTextClip('Made by Penguin Jeffrey', 'Helvetica', 'black', 0, 2)
+    credits = CompositeVideoClip([paper.set_pos('center'), penguin.set_pos(('center', 60)), madeBy.set_pos(('center', 300))], size=(640, 480))
+
     return credits
 
 def createMovieWithAudio(id, urls, sentences, fragments, audioPath):
@@ -65,19 +70,22 @@ def createMovieWithAudio(id, urls, sentences, fragments, audioPath):
         seconds = fragment['end'] - fragment['begin']
         sentence = sentences[idx]
         newVideo = createVideoClip(url, 0, seconds)
-        clips.append(newVideo)
+        newText = createTextClip(sentence, "Helvetica", 'white', 0, seconds)
+        video = CompositeVideoClip([newVideo.set_pos('center'), newText.set_pos((('center'), ('bottom')))],
+                                        size=(640, 480))
+        clips.append(video)
 
-    clips.append(credits())
     print("Concatenating")
+    clips.append(credits())
+
     final_clip = concatenate_videoclips(clips)
+
     #audio = AudioFileClip(audioPath)
-    print("Final video clip")
-    video = CompositeVideoClip([final_clip.set_pos('center')], size=(640, 480))
     #video.set_audio(audio.set_duration(final))
 
     writePath = '../CreatedStories/New/'  + str(id)  + '.mp4'
     # Write the result to a file (many  options available !)
-    video.write_videofile(          writePath,
+    final_clip.write_videofile(          writePath,
                                     fps=30,
                                     preset='veryfast',
                                     progress_bar=True,

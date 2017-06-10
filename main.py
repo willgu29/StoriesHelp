@@ -26,7 +26,14 @@ logo_gif_url = "https://media.giphy.com/media/VkMV9TldsPd28/giphy.gif"
 from mongoengine import *
 from mongoengine import connect
 from datetime import *
-connect("extendV0", host='mongodb://penguinjeffrey:ilikefish12@ds113282.mlab.com:13282/penguinjeffrey')
+
+if app.config['PRODUCTION']:
+    print ('Production mode')
+    connect("extendV0", host='mongodb://penguinjeffrey:ilikefish12@ds113282.mlab.com:13282/penguinjeffrey')
+else:
+    print ('Develop')
+    connect('localTest', host='')
+
 
 class Story(Document):
     title = StringField(required=True, default="")
@@ -113,6 +120,9 @@ def all():
         stories.append(story)
     return render_template('listStories.html', stories = stories)
 
+@app.route('/secret/upload/<id>')
+def uploadSecret(id):
+    return render_template('uploadSecret.html', id=id)
 
 @app.route("/create")
 def create():

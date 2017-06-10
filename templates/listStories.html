@@ -1,7 +1,7 @@
-<h2>Create Text MP4:</h2>
+<h2>Upload and view options:</h2>
 
 {% if stories is defined %}
   {% for story in stories %}
-      <a href="{{url_for('.renderAPI', id = story.id)}}">{{story.title}}</a> <br />
+      <a href="{{url_for('.uploadSecret', id = story.id)}}">{{story.title}}</a> <br />
   {% endfor %}
 {% endif %}
