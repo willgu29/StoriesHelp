@@ -32,14 +32,14 @@ if app.config['PRODUCTION']:
     connect("extendV0", host='mongodb://penguinjeffrey:ilikefish12@ds113282.mlab.com:13282/penguinjeffrey')
 else:
     print ('Develop')
-    connect('localTest', host='')
+    connect('localTest', host='mongodb://127.0.0.1/test')
 
 
 class Story(Document):
     title = StringField(required=True, default="")
     sentences = ListField(StringField(), required=True, default=list)
 
-    #not necessarily .gif, may include .mp4 as well
+    #not necessarily .gif, usually .mp4 now
     gifURLS = ListField(URLField(), required=True, default=list)
     videoURL = StringField(default="")
     isPublic = BooleanField(default=True)
@@ -108,9 +108,13 @@ def test():
 @app.route("/")
 def home():
     stories = []
-    for story in Story.objects:
+    mostRecentStory = {}
+    for story in Story.objects.order_by('-id'):
+        if mostRecentStory == {} and story.videoURL != "":
+            mostRecentStory = story
         stories.append(story)
-    return render_template('home.html', stories = stories, toDate=refreshDate)
+
+    return render_template('home.html', stories = stories, display = mostRecentStory)
 
 
 @app.route("/secret/all")
@@ -375,6 +379,12 @@ def updateContent():
 
     return jsonify(sentences=sentences, urls=newURLS, selected=selected)
 
+@app.route('/api/story/<id>', methods = ["GET"])
+def getStory(id):
+    stories = Story.objects(id=id)
+    story = stories[0]
+
+    return story.to_json()
 
 
 @app.route("/api/<contentType>")
@@ -395,7 +405,6 @@ def getContent(contentType):
 
 
 
-#test: 5918d18159840b0009258fb4
 @app.route('/api/render/<id>', methods= ["GET", "POST"])
 def renderAPI(id):
     stories = Story.objects(id=id)
