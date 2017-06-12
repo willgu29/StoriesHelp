@@ -5,14 +5,15 @@ imageio.plugins.ffmpeg.download()
 from moviepy.editor import *
 from moviepy.video.fx.all import loop
 from moviepy.video.fx.all import crop
+from moviepy.video.fx.all import margin
 from moviepy.audio.AudioClip import AudioClip
 import CreateTiming
 
 
 def createVideoClip(url, start, out):
     newClip = VideoFileClip(url)
-    newClip = newClip.resize(width=640)
-    newClip = newClip.crop(y2=360)
+    newClip = newClip.resize(height=360)
+    newClip = newClip.crop(x2=640)
     newClip = newClip.volumex(0)
     newClip = clipToDuration(newClip, (out-start))
     newClip = newClip.set_start(start)
@@ -27,7 +28,7 @@ def clipToDuration(clip, targetSeconds):
 def createTextClip(text, font, color, start, out):
     newTextClip = TextClip(txt=text,
                             font=font,
-                            fontsize=24,
+                            fontsize=36,
                             color=color,
                             method="caption",
                             align='South',
@@ -35,6 +36,7 @@ def createTextClip(text, font, color, start, out):
 
     newTextClip = newTextClip.set_duration(out)
     newTextClip = newTextClip.set_start(start)
+    newTextClip = newTextClip.margin(bottom=5, opacity=0)
 
     return newTextClip
 

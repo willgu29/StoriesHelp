@@ -35,7 +35,7 @@ class ImportStory extends Component {
   render() {
     var showInput = (<input type="submit" value="generate story" />)
     var showSpinner = (<p></p>);
-    var showGuide = (<p>Tell your story here:</p>);
+    var showGuide = (<p>Tell your story (meme):</p>);
     if (this.state.isLoading) {
       showGuide = (<div></div>);
       showSpinner = (<p>Loading... this may take a minute or two</p>);

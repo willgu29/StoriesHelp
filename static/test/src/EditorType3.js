@@ -1,97 +1,97 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import penguin from './logo.jpg';
-
-import './App.css';
-import axios from 'axios';
-
-import Preview from './Preview.js'
-import Render from './Render.js'
-import Editor from './Editor.js'
-import EditorType2 from './EditorType2.js'
-import EditorType3 from './EditorType3.js'
+import axios from 'axios'
 
 
-class App extends Component {
-  constructor(props) {
-   super(props);
-   this.createSlide = this.createSlide.bind(this);
-   this.createStory = this.createStory.bind(this);
-   this.handleEdit = this.handleEdit.bind(this);
-   this.handleClick = this.handleClick.bind(this);
-   this.state = {
-     sentences: [],
-     urls: [],
-     previewLoaded : false
-   }
+class EditorType3 extends Component {
+  constructor(props){
+    super(props);
+    this.createSlide = this.createSlide.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSentences = this.handleSentences.bind(this);
+    this.state = {
+      isLoaded : false,
+      isLoading : false,
+      currentIndex : -1,
+      importedSentences : [],
+      sentences : [],
+      urls : [],
+      text : ''
+    }
   }
-  componentDidMount() {
-    document.title = "PJ"
-  }
-  createSlide(text, url) {
+  createSlide(sentence, url){
     var sentences = this.state.sentences;
     var urls = this.state.urls;
-    sentences.push(text);
+    sentences.push(sentence);
     urls.push(url);
+    var nextIndex = this.state.currentIndex + 1;
+    if (nextIndex == this.state.importedSentences.length) {
+      this.props.createStory(sentences, urls)
+      return;
+    }
     this.setState({
       sentences : sentences,
-      urls : urls
+      urls : urls,
+      currentIndex : nextIndex
     })
   }
-  createStory(sentences, urls) {
-    var thisSentences = this.state.sentences;
-    var thisUrls = this.state.urls;
-    thisSentences.push.apply(thisSentences, sentences);
-    thisUrls.push.apply(thisUrls, urls);
+  handleSentences(object){
     this.setState({
-      sentences : thisSentences,
-      urls : thisUrls,
-      previewLoaded : true
+      currentIndex : 0,
+      importedSentences : object['sentences'],
+      isLoaded : true
     })
   }
-  handleEdit(){
-    this.setState({
-      previewLoaded : false
-    })
-  }
-  handleClick(event){
+  handleSubmit(event){
     event.preventDefault();
-    //app logo clicked, go home.
-    if (window.confirm("Return home? You'll lose all your progress.")){
-      window.location.href = ('/');
-    }
+    getSentences(this.state.text, this.handleSentences)
+    this.setState({
+      isLoading : true
+    })
+
   }
-  render() {
-    //        <TypeStory createSlide={this.createSlide} ></TypeStory>
-    if (this.state.previewLoaded) {
-      return (
-      <div className="App">
-        <div className="App-header">
-          <img src={penguin} onClick={this.handleClick} className="App-logo" alt="logo" />
-          <h2>Welcome to Penguin Jeffrey</h2>
+  handleChange(event){
+    event.preventDefault();
+    this.setState({
+      text : event.target.value
+    })
+  }
+  render(){
+
+
+    if (this.state.isLoaded) {
+      var sentence = this.state.importedSentences[this.state.currentIndex];
+      return(
+        <div>
+          <TypeStory sentence={sentence} createSlide={this.createSlide} ></TypeStory>
         </div>
-        <br />
-        <br />
-
-
-        <Preview
-                  onEdit={this.handleEdit}
-                  sentences={this.state.sentences}
-                  urls={this.state.urls}></Preview>
-      </div>
       );
-
     } else {
-      return (
-        <div className="App">
-          <div className="App-header">
-            <img src={penguin} onClick={this.handleClick} className="App-logo" alt="logo" />
-            <h2>Welcome to Penguin Jeffrey</h2>
-          </div>
-            <EditorType3 createStory={this.createStory}></EditorType3>
+
+      var showSpinner = (<p></p>);
+      var showGuide = (<p>Tell your story here:</p>);
+      var showInput = (<input type="submit" value="create story" />)
+
+      if (this.state.isLoading) {
+        showSpinner = (<p>Loading...</p>)
+        showGuide = (<p></p>)
+      }
+      if (this.state.text == ''){
+        showInput = (<div></div>)
+      }
+      return(
+        <div>
+          {showSpinner}
+          {showGuide}
+          <form onSubmit={this.handleSubmit}>
+              <textarea rows="20" cols="80" value={this.state.text} onChange={this.handleChange}></textarea>
+              <br />
+              {showInput}
+          </form>
         </div>
       );
     }
+
   }
 }
 
@@ -102,7 +102,8 @@ class TypeStory extends Component {
   constructor(props) {
    super(props);
    this.timer = null;
-   this.state = {text : '',
+   this.state = {text : this.props.sentence,
+                 description : this.props.sentence,
                 url : '',
                 urls : [],
                 isLoading : false};
@@ -113,9 +114,19 @@ class TypeStory extends Component {
    this.triggerChange = this.triggerChange.bind(this);
    this.handleUpdate = this.handleUpdate.bind(this);
    this.refreshGifs = this.refreshGifs.bind(this);
-
+   this.handleSearch = this.handleSearch.bind(this);
 
   }
+  componentDidMount(){
+    this.triggerChange();
+  }
+  componentWillReceiveProps(nextProps){
+    this.setState({
+      text : nextProps.sentence,
+      description : nextProps.sentence
+    }, this.triggerChange)
+  }
+
   refreshURLS(urls) {
     //replace .gif with .mp4
     var mp4s = []
@@ -129,29 +140,33 @@ class TypeStory extends Component {
   }
 
   handleChange(event) {
-    clearTimeout(this.timer);
-    this.setState({text: event.target.value});
-    this.timer = setTimeout(this.triggerChange, WAIT_INTERVAL);
+    if (event.target.id == "description") {
+      this.setState({description: event.target.value});
+    } else {
+      this.setState({text: event.target.value});
+    }
+
   }
 
   triggerChange() {
-    if (this.state.text != "") {
+    if (this.state.description != "") {
       this.state.url = ""
-      search(this.state.text, this.refreshURLS)
+      search(this.state.description, this.refreshURLS)
       this.setState({isLoading : true})
     }
   }
   refreshGifs(event) {
     event.preventDefault();
-    search(this.state.text, this.refreshURLS)
+    search(this.state.description, this.refreshURLS)
     this.setState({isLoading : true})
     //Todo show spinner/loader
   }
   handleSubmit(event) {
    event.preventDefault();
-
-   this.props.createSlide(this.state.text, this.state.url);
+   var url = this.state.url.replace('.gif', '.mp4', 1)
+   this.props.createSlide(this.state.text, url);
    this.setState({text : '',
+                  description : '',
                   url  : '',
                   urls : [],
                   isLoading : false})
@@ -172,20 +187,33 @@ class TypeStory extends Component {
       isLoading : false
     });
   }
+  handleSearch(event){
+    event.preventDefault();
+    this.triggerChange()
+  }
 
   render() {
     var showInput = (<input type="submit" value="add sentence" />)
     var showSpinner = (<p></p>);
-
+    var showGuide = (<p>Choose a clip that represents the sentence: <em><b>{this.state.text}</b></em></p>);
 
     if (this.state.url == ''){
       showInput = (<div></div>)
     }
     if (this.state.isLoading) {
       showSpinner = (<p>Loading...</p>)
+      showGuide = (<p></p>);
     }
     return (
       <div>
+        {showGuide}
+        <form onSubmit={this.handleSearch}>
+          <input type="text" id="description" placeholder="clip description" value={this.state.description}
+                                                            onChange={this.handleChange}/>
+          <input type="submit" value="search" />
+
+        </form>
+
         {showSpinner}
         <ContentViews onSelect={this.handleURL}
                       triggerChange={this.triggerChange}
@@ -197,44 +225,19 @@ class TypeStory extends Component {
         <br />
       <form onSubmit={this.handleSubmit}>
 
-          <textarea rows="2" cols="40" value={this.state.text} onChange={this.handleChange}></textarea>
+           <textarea rows="2" cols="40" value={this.state.text}
+                                        onChange={this.handleChange}></textarea>
+        <br />
         {showInput}
       </form>
-
+      <br />
+      <br />
       </div>
 
     );
   }
 }
 
-
-// **********  Extra Functions ---- >
-
-
-function search(query, callback){
-  return fetch('/api/gifs?q='+query , {
-    accept: 'application/json',
-  }).then(checkStatus)
-  .then(parseJSON)
-  .then(callback);
-}
-
-function checkStatus(response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response;
-  }
-  const error = new Error(`HTTP Error ${response.statusText}`);
-  error.status = response.statusText;
-  error.response = response;
-  console.log(error); // eslint-disable-line no-console
-  throw error;
-}
-
-
-function parseJSON(response) {
-  console.log(response)
-  return response.json();
-}
 
 
 // ********** Styles --- >
@@ -300,9 +303,10 @@ class VideoView extends Component {
                 className="Display-video" autoPlay loop muted
                 src={this.props.url}>
         </video>
-        <p className="small-caption">{this.state.duration} seconds</p>
       </div>
     );
+    //    <p className="small-caption">{this.state.duration} seconds</p>
+
   }
 }
 
@@ -400,23 +404,58 @@ class ContentViews extends Component {
     var showRefresh = (<div></div>);
     if (this.props.urls.length > 0) {
       userInput = (<form className="reset-alignment" onSubmit={this.handleSubmit}>
-                      Load gif link: <input type="text" onChange={this.handleChange} value={this.state.text} />
-                      <input type="submit" value="load gif" />
+                      Load video link: <input type="text" onChange={this.handleChange} value={this.state.text} />
+                      <input type="submit" value="load clip" />
                     </form>)
       showRefresh = (<form onSubmit={this.refreshGifs}>
-                          <input type="submit" value="refresh gifs" />
+                          <input type="submit" value="refresh clips" />
                      </form>);
     }
     return (
     <div>
-      {showRefresh} <br />
       {this.renderURLS()}
-      {userInput}
     </div>
 
   );
   }
 }
 
+function getSentences(textBlob, callback) {
+  axios.post('/api/sentences', {
+    story : textBlob,
+  }).then(checkStatus).then(returnObject).then(callback);
+}
 
-export default App;
+function returnObject(object) {
+  console.log(object)
+  return object.data;
+}
+
+function search(query, callback){
+  return fetch('/api/gifs?q='+query , {
+    accept: 'application/json',
+  }).then(checkStatus)
+  .then(parseJSON)
+  .then(callback);
+}
+
+function checkStatus(response) {
+  if (response.status >= 200 && response.status < 300) {
+    return response;
+  }
+  const error = new Error(`HTTP Error ${response.statusText}`);
+  error.status = response.statusText;
+  error.response = response;
+  console.log(error); // eslint-disable-line no-console
+  throw error;
+}
+
+
+function parseJSON(response) {
+  console.log(response)
+  return response.json();
+}
+
+
+
+export default EditorType3;

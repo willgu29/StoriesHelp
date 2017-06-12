@@ -112,7 +112,8 @@ def home():
     for story in Story.objects.order_by('-id'):
         if mostRecentStory == {} and story.videoURL != "":
             mostRecentStory = story
-        stories.append(story)
+        if story.isPublic:
+            stories.append(story)
 
     return render_template('home.html', stories = stories, display = mostRecentStory)
 
@@ -399,6 +400,8 @@ def getContent(contentType):
         print "pics"
     elif (contentType == "vids"):
         print "vids"
+        parts, urls, mp4s = pixabayAPI.getVideosFromSentence(text)
+        return jsonify(urls=mp4s)
     else:
         print "other"
         return []
