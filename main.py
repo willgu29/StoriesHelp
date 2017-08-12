@@ -35,6 +35,7 @@ else:
     connect('localTest', host='mongodb://127.0.0.1/test')
 
 
+
 class Story(Document):
     title = StringField(required=True, default="")
     sentences = ListField(StringField(), required=True, default=list)
@@ -63,7 +64,9 @@ class Request(Document):
 
 refreshDate = "2017/05/23"
 
-
+@app.route('/lan')
+def lan():
+    return render_template('lan.html')
 
 # Configure the image uploading via Flask-Uploads
 audio = UploadSet('audio', AUDIO)
