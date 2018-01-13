@@ -74,12 +74,14 @@ def translate():
     lang = Translate.get_language(text)
     return jsonify(lang)
 
-@app.route('/translate-english', methods=['POST'])
-def translate_english():
-    json = request.get_json()
-    text = json['text']
-    translation = Translate.to_english(text)
-    return jsonify(str(translation))
+# When posting from axios, not sending proper characters b/c no
+# language globalization support, therefore can't translate
+# @app.route('/translate-english', methods=['POST'])
+# def translate_english():
+#     json = request.get_json()
+#     text = json['text']
+#     translation = Translate.to_english(text)
+#     return jsonify(str(translation))
 
 
 @app.route('/lan')
