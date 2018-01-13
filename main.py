@@ -74,6 +74,13 @@ def translate():
     lang = Translate.get_language(text)
     return jsonify(lang)
 
+@app.route('/translate-english', methods=['POST'])
+def translate_english():
+    json = request.get_json()
+    text = json['text']
+    translation = Translate.to_english(text)
+    return jsonify(translation)
+
 
 @app.route('/lan')
 def lan():
