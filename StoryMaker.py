@@ -28,7 +28,7 @@ def clipToDuration(clip, targetSeconds):
 def createTextClip(text, font, color, start, out):
     newTextClip = TextClip(txt=text,
                             font=font,
-                            fontsize=36,
+                            fontsize=30,
                             color=color,
                             method="caption",
                             align='South',

@@ -17,6 +17,7 @@ import convertToStory
 import CreateTiming
 import StringConversion
 import StoryMaker
+import Translate
 
 
 logo_gif_url = "https://media.giphy.com/media/VkMV9TldsPd28/giphy.gif"
@@ -32,7 +33,8 @@ if app.config['PRODUCTION']:
     connect("extendV0", host='mongodb://penguinjeffrey:ilikefish12@ds113282.mlab.com:13282/penguinjeffrey')
 else:
     print ('Develop')
-    connect('localTest', host='mongodb://127.0.0.1/test')
+    #connect('localTest', host='mongodb://127.0.0.1/test')
+    connect('localTest', host='mongodb://pjtest:nomnom12nom!@ds163836.mlab.com:63836/pjtest')
 
 
 
@@ -63,6 +65,15 @@ class Request(Document):
 
 
 refreshDate = "2017/05/23"
+
+#must send 3 characters or more
+@app.route('/translate', methods=['POST'])
+def translate():
+    json = request.get_json()
+    text = json['text']
+    lang = Translate.get_language(text)
+    return jsonify(lang)
+
 
 @app.route('/lan')
 def lan():
