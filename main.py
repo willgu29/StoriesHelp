@@ -79,7 +79,7 @@ def translate_english():
     json = request.get_json()
     text = json['text']
     translation = Translate.to_english(text)
-    return jsonify(translation)
+    return jsonify(str(translation))
 
 
 @app.route('/lan')
